@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.program.hubhug.maze2" provider-name="The[COLOR tan]Highway[/COLOR]"
-       version="0.0.1" name="HUB-HUG Exit The Maze 2">
+<addon id="plugin.program.hubhug.maze3" provider-name="The[COLOR tan]Highway[/COLOR]"
+       version="0.0.1" name="HUB-HUG Exit The Maze 3">
   <requires>
   	<import addon="xbmc.python" version="2.1.0" />
   	<import addon="script.module.addon.common"  />

@@ -14,6 +14,7 @@ import xbmc,xbmcgui,urllib,urllib2,os,sys,logging,array,re,time,datetime,random,
 from config import Config as Config
 MyBrowser=['User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3']; 
 
+def cFLL( t,c='tan'): return '[color '+c+']'+t+'[/color]' ### For Coloring Text ###
 def cFL( t,c='tan'): return '[COLOR '+c+']'+t+'[/COLOR]' ### For Coloring Text ###
 def cFL_(t,c='tan'): return '[COLOR '+c+']'+t[0:1]+'[/COLOR]'+t[1:] ### For Coloring Text (First Letter-Only) ###
 def deb(s,t): ### for Writing Debug Data to log file ###

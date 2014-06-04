@@ -20,8 +20,13 @@ def SFX(n,e='.wav'):
 class MyWindow(xbmcgui.Window):
 	visuals={}; button={}; Mistakes=0; NoOfMoves=0; 
 	countA=0; countB=0; LineLength=0; 
-	MazeFont='font10'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
+	MazeFont='font10'; MazeFont2='font14'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
+	cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; 
+	StatsMsg='Level: %s   Life: %s   Keys: %s   Battle Wins: %s   Battle Losses: %s   '
+	#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 	MazeVisL=630; MazeVisT=20; WH=64*2; 
+	##
+	gameLevel=0; gameLifes=1; gameKeys=0; gameMonstersKilled=0; gameMonstersLostTo=0; 
 	##
 	tWinner='winner'; GridButton={}; GridButtonUD={}; GridButtonUDC={}; GridButtonUDN={}; 
 	Hands=[1,2,3];
@@ -55,18 +60,36 @@ class MyWindow(xbmcgui.Window):
 		self.PuzzleFileHolder_Original=''+self.PuzzleFileHolder
 		self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cStart,self.cUser,1)
 		self.LineLength=len(self.PuzzleFileHolder.split('\n')[0]);
+		self.gameLevel=self.gameLevel+1; 
 		#self.PrepareMaze(self.PuzzleFileHolder)
 		##
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+		#self.cMonster='R'; self.cKey='K'; self.cDoor='D'; self.cLife='L'; 
 	def PrepareMaze(self,t):
-		t=t.replace(self.cPath,cFL(self.cWall,'black'))
-		#t=t.replace(self.cPath,cFL(self.cWall,'black'))
-		t=t.replace(self.cUser, cFL(self.cUser,'lightblue'), 1)
-		t=t.replace(self.cEnd, cFL(self.cEnd,'red'), 1) 
-		t=t.replace(self.cStart, cFL(self.cStart,'green'), 1) 
+		t=t.replace(self.cPath,cFLL(self.cWall,'black'))
+		#t=t.replace(self.cPath,cFLL(self.cWall,'black'))
+		##
+		if (tfalse(SettingG("show-items"))==True): 
+			c='grey' #'black'
+			t=t.replace(self.cLife, cFLL(self.cLife,'maroon') ) 
+			t=t.replace(self.cMonster, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cDoor, cFLL(self.cDoor,'grey') ) 
+			t=t.replace(self.cKey, cFLL(self.cKey,'yellow') ) 
+		else:
+			c='black'
+			t=t.replace(self.cLife, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cDoor, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cKey, cFLL(self.cWall,c) ) 
+		##
+		t=t.replace(self.cUser, cFLL(self.cUser,'lightblue') )
+		t=t.replace(self.cEnd, cFLL(self.cEnd,'red') ) 
+		t=t.replace(self.cStart, cFLL(self.cStart,'green') ) 
 		t=cFL(t,'mediumpurple')
+		t=t.replace('[color ','[COLOR ').replace('[/color]','[/COLOR]')
 		self.PuzzleFileHolder_Publish=t
 		self.HoroTxt.setText(self.PuzzleFileHolder_Publish)
+		self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 	def makePageItems(self):
 		focus=artp("button-focus_lightblue"); nofocus=artp("button-focus_seagreen"); self.background=self.Fanart; #self.background=artj("backdrop_temp"); 
 		## ### ## Background
@@ -85,6 +108,14 @@ class MyWindow(xbmcgui.Window):
 		self.HoroTxtBG.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0 end=90')]); 
 		self.HoroTxt.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
 		#self.HoroTxt.setText("blah..........."); 
+		l=100; t=self.scr['H']-40; w=self.scr['W']-(l*2); h=40; 
+		self.HoroTxt2BG=xbmcgui.ControlButton(l,t,w,h,"",textColor="0xFF000000",focusedColor="0xFF00BFFF",alignment=2,focusTexture=self.b1,noFocusTexture=self.b1); 
+		self.HoroTxt2=xbmcgui.ControlTextBox(l+10,t+2,w-20,h-4,font=self.MazeFont2,textColor="0xFFFFFFFF"); 
+		zz=[self.HoroTxt2BG,self.HoroTxt2]
+		for z in zz: self.addControl(z); #z.setAnimations([('WindowOpen','effect=fade delay=2000 time=2000 start=0 end=80')]); 
+		self.HoroTxt2BG.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0 end=90')]); 
+		self.HoroTxt2.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
+		
 		## ### ## Addon Title
 		zz=["XBMCHUB","Your","HUB-HUG"]; w=1000; h=50; l=15; t=700; t=560; self.LabTitleText=Config.name; self.LabTitle=xbmcgui.ControlLabel(l,t,w,h,'','font30','0xFFFF0000',angle=90); self.addControl(self.LabTitle)
 		for z in zz:
@@ -122,15 +153,35 @@ class MyWindow(xbmcgui.Window):
 		if Pos > len(self.PuzzleFileHolder): return defaultMissing
 		try:
 			P=self.PuzzleFileHolder[Pos]; 
+			CurPos=self.PuzzleFileHolder.index(self.cUser)
+			if   Pos==(CurPos-(self.LineLength+1)): y=True
+			elif Pos==(CurPos-(1)): y=True
+			elif Pos==(CurPos+(1)): y=True
+			elif Pos==(CurPos+(self.LineLength+1)): y=True
+			else: y=False
 			#deb(str(Pos),P); 
 			if   P==self.cWall: return 'f_purple'
 			elif P==self.cEnd: return 'home-favourites-FO_red'
 			elif P==self.cStart: return 'home-power-FO_green'
 			elif P==self.cPath: return 'f_black2'
 			elif P==self.cUser: return 'f_seagreen'
+			elif P==self.cMonster: 
+				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'monster01'
+				else: return 'f_black2'
+			elif P==self.cKey: 
+				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'key01'
+				else: return 'f_black2'
+			elif P==self.cDoor: 
+				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'door01'
+				else: return 'f_black2'
+			elif P==self.cLife: 
+				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'life01'
+				else: return 'f_black2'
 			else: return defaultMissing
 		except: return defaultMissing
+		#if (tfalse(SettingG("show-items"))==True): 
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+		#self.cMonster='R'; self.cKey='K'; self.cDoor='D'; self.cLife='L'; 
 	def displayVisualItems(self,NewPos):
 		self.displayVisualItem('L0C0',self.checkData( NewPos-((self.LineLength+1)*2)-2 )); 
 		self.displayVisualItem('L0C1',self.checkData( NewPos-((self.LineLength+1)*2)-1 )); 
@@ -228,8 +279,9 @@ class MyWindow(xbmcgui.Window):
 		elif action == Config.ACTION_NAV_BACK: self.CloseWindow1st()
 		else:
 		#elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
-			try: self.DoFight(action,F)
-			except: pass
+			#try: 
+				self.DoFight(action,F)
+			#except: pass
 	def onControl(self,control):
 		if   control==self.button[0]: self.CloseWindow1st()
 		#elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
@@ -263,7 +315,36 @@ class MyWindow(xbmcgui.Window):
 		elif self.PuzzleFileHolder[NewPos]==self.cPath:  MoveValid=True; 
 		elif self.PuzzleFileHolder[NewPos]==self.cEnd: 	 MoveValid=True; 
 		elif self.PuzzleFileHolder[NewPos]==self.cStart: MoveValid=True; 
-		else: MoveValid=False
+		#
+		#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
+		elif self.PuzzleFileHolder[NewPos]==self.cMonster: 
+			SFX('hit_with_frying_pan_y'); 
+			self.gameLifes=self.gameLifes-1; deb('Found','Monster'); 
+			if self.gameLifes > 0:
+				splash.do_My_Splash(artp('dead_halo_smiley'),1,True,(self.scr['W']-(256*2))/2,(self.scr['H']-(256*2))/2,(256*2),(256*2)); 
+			#self.gameMonstersLostTo=self.gameMonstersLostTo+1; 
+			#self.gameMonstersKilled=self.gameMonstersKilled+1; 
+			self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
+			MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cKey: 
+			SFX('gasp_x'); 
+			self.gameKeys=self.gameKeys+1; deb('Found','Key'); 
+			self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
+			MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cDoor: 
+			if self.gameKeys > 0:
+				SFX('door2'); 
+				self.gameKeys=self.gameKeys-1; deb('Found','Door'); 
+				self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
+				MoveValid=True; 
+			else: MoveValid=False; 
+		elif self.PuzzleFileHolder[NewPos]==self.cLife: 
+			SFX('heartbeat1'); 
+			self.gameLifes=self.gameLifes+1; deb('Found','Extra Life'); 
+			self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
+			MoveValid=True; 
+		#
+		else: MoveValid=False; 
 		#debob('NewPos character "'+self.PuzzleFileHolder[NewPos]+'"'); 
 		if MoveValid==True:
 			#debob('valid move from '+str(CurPos)+' to '+str(NewPos))
@@ -281,18 +362,36 @@ class MyWindow(xbmcgui.Window):
 			#self.PuzzleFileHolder=
 			#self.PuzzleFileHolder[NewPos:1]=self.cUser
 			#self.PuzzleFileHolder[NewPos]=self.cUser
-			if self.PuzzleFileHolder_Original[NewPos]==self.cEnd: 
-				self.VictoryDance(); 
 			self.PuzzleFileHolder=self.PuzzleFileHolder[0:NewPos]+self.cUser+self.PuzzleFileHolder[NewPos+1:len(self.PuzzleFileHolder)]; 
+			if self.gameLifes < 1: self.GameOver(); 
+			elif self.PuzzleFileHolder_Original[NewPos]==self.cEnd: self.VictoryDance(); 
 			if (tfalse(SettingG("show-map"))==True) and (tfalse(SettingG("show-maplocation"))==True): self.PrepareMaze(self.PuzzleFileHolder); 
+			NewPos=self.PuzzleFileHolder.index(self.cUser); 
 			self.displayVisualItems(NewPos); 
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+	def replacePos(self,Pos,n,t):
+		try: return t[0:Pos]+n+t[Pos+1:len(t)]
+		except: return t
+		
 	def VictoryDance(self):
 		try:
 				debob("game won"); 
 				SFX('fanfare_x'); 
 				#splash.do_My_Splash(self.iDuckShot3,1); 
-				splash.do_My_Splash(artj('corn-maze-exit'),10,True,(self.scr['W']-500)/2,(self.scr['H']-333)/2,500,333); 
+				splash.do_My_Splash(artj('corn-maze-exit'),3,True,(self.scr['W']-500)/2,(self.scr['H']-333)/2,500,333); 
+				#splash.do_My_Splash(artj('corn-maze-exit'),2,True,10,150,self.scr['W']-200,self.scr['H']-150); 
+				self.LoadGridFile(); 
+				xbmc.sleep(20); 
+				NewPos=self.PuzzleFileHolder.index(self.cUser); 
+				self.displayVisualItems(NewPos); 
+				#self.CloseWindow1st(); #DoA("Back"); 
+		except: pass
+	def GameOver(self):
+		try:
+				debob("game lost"); 
+				SFX('exit_cue_y'); 
+				#splash.do_My_Splash(self.iDuckShot3,1); 
+				splash.do_My_Splash(artj('youaredead_icon_icon921'),3,True,(self.scr['W']-(256*2))/2,(self.scr['H']-(256*2))/2,(256*2),(256*2)); 
 				#splash.do_My_Splash(artj('corn-maze-exit'),2,True,10,150,self.scr['W']-200,self.scr['H']-150); 
 				self.CloseWindow1st(); #DoA("Back"); 
 		except: pass
