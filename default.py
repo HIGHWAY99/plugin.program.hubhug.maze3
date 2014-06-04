@@ -22,6 +22,7 @@ class MyWindow(xbmcgui.Window):
 	countA=0; countB=0; LineLength=0; 
 	MazeFont='font10'; MazeFont2='font14'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
 	cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; 
+	cMonster0='0'; cMonster1='1'; cMonster2='2'; cMonster3='3'; cMonster4='4'; cMonster5='5'; cMonster6='6'; cMonster7='7'; cMonster8='8'; cMonster9='9'; 
 	StatsMsg='Level: %s   Life: %s   Keys: %s   Battle Wins: %s   Battle Losses: %s   '
 	#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 	MazeVisL=630; MazeVisT=20; WH=64*2; 
@@ -73,12 +74,32 @@ class MyWindow(xbmcgui.Window):
 			c='grey' #'black'
 			t=t.replace(self.cLife, cFLL(self.cLife,'maroon') ) 
 			t=t.replace(self.cMonster, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster0, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster1, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster2, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster3, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster4, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster5, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster6, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster7, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster8, cFLL(self.cMonster,'coral') ) 
+			t=t.replace(self.cMonster9, cFLL(self.cMonster,'coral') ) 
 			t=t.replace(self.cDoor, cFLL(self.cDoor,'grey') ) 
 			t=t.replace(self.cKey, cFLL(self.cKey,'yellow') ) 
 		else:
 			c='black'
 			t=t.replace(self.cLife, cFLL(self.cWall,c) ) 
 			t=t.replace(self.cMonster, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster0, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster1, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster2, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster3, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster4, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster5, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster6, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster7, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster8, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster9, cFLL(self.cWall,'c') ) 
 			t=t.replace(self.cDoor, cFLL(self.cWall,c) ) 
 			t=t.replace(self.cKey, cFLL(self.cWall,c) ) 
 		##
@@ -117,7 +138,9 @@ class MyWindow(xbmcgui.Window):
 		self.HoroTxt2.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
 		
 		## ### ## Addon Title
-		zz=["XBMCHUB","Your","HUB-HUG"]; w=1000; h=50; l=15; t=700; t=560; self.LabTitleText=Config.name; self.LabTitle=xbmcgui.ControlLabel(l,t,w,h,'','font30','0xFFFF0000',angle=90); self.addControl(self.LabTitle)
+		zz=["XBMCHUB","Your","HUB-HUG"]; w=1000; h=50; l=15; t=700; t=560; 
+		self.LabTitleText=Config.name2; #self.LabTitleText=Config.name; 
+		self.LabTitle=xbmcgui.ControlLabel(l,t,w,h,'','font30','0xFFFF0000',angle=90); self.addControl(self.LabTitle)
 		for z in zz:
 			if z+" " in self.LabTitleText: self.LabTitleText=self.LabTitleText.replace(z+" ","[COLOR deepskyblue][B][I]"+z+"[/I][/B][/COLOR]  [CR]")
 		if "Highway" in self.LabTitleText: self.LabTitleText=self.LabTitleText.replace("Highway","[COLOR tan]Highway[/COLOR]")
@@ -147,6 +170,16 @@ class MyWindow(xbmcgui.Window):
 		#	try: self.visuals[iTag].setImage(visImg,True);
 		#	except: pass
 		
+	def getHeroAvatar(self):
+				try:
+					return {
+						'SeaGreen':					'SeaGreen'
+						,'BlueShades1':			'hero01'
+						,'BlueShades2':			'hero02'
+						,'GreyHuman':				'hero03'
+						#,'':				''
+					}[SettingG("img-player")]
+				except: return 'f_seagreen'
 	def checkData(self,Pos):
 		defaultMissing='ThumbShadow'; 
 		if Pos < 0: return defaultMissing
@@ -160,22 +193,62 @@ class MyWindow(xbmcgui.Window):
 			elif Pos==(CurPos+(self.LineLength+1)): y=True
 			else: y=False
 			#deb(str(Pos),P); 
+			Si=tfalse(SettingG("show-items")); 
 			if   P==self.cWall: return 'f_purple'
 			elif P==self.cEnd: return 'home-favourites-FO_red'
 			elif P==self.cStart: return 'home-power-FO_green'
 			elif P==self.cPath: return 'f_black2'
-			elif P==self.cUser: return 'f_seagreen'
+			elif P==self.cUser: 
+				try:
+					return {
+						'SeaGreen':					'SeaGreen'
+						,'BlueShades1':			'hero01'
+						,'BlueShades2':			'hero02'
+						,'GreyHuman':				'hero03'
+						#,'':				''
+					}[SettingG("img-player")]
+				except: return 'f_seagreen'
 			elif P==self.cMonster: 
-				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'monster01'
+				if (y==True) or (Si==True): return 'monster0R'
+				else: return 'f_black2'
+			elif P==self.cMonster0: 
+				if (y==True) or (Si==True): return 'monster00'
+				else: return 'f_black2'
+			elif P==self.cMonster1: 
+				if (y==True) or (Si==True): return 'monster01'
+				else: return 'f_black2'
+			elif P==self.cMonster2: 
+				if (y==True) or (Si==True): return 'monster02'
+				else: return 'f_black2'
+			elif P==self.cMonster3: 
+				if (y==True) or (Si==True): return 'monster03'
+				else: return 'f_black2'
+			elif P==self.cMonster4: 
+				if (y==True) or (Si==True): return 'monster04'
+				else: return 'f_black2'
+			elif P==self.cMonster5: 
+				if (y==True) or (Si==True): return 'monster05'
+				else: return 'f_black2'
+			elif P==self.cMonster6: 
+				if (y==True) or (Si==True): return 'monster06'
+				else: return 'f_black2'
+			elif P==self.cMonster7: 
+				if (y==True) or (Si==True): return 'monster07'
+				else: return 'f_black2'
+			elif P==self.cMonster8: 
+				if (y==True) or (Si==True): return 'monster08'
+				else: return 'f_black2'
+			elif P==self.cMonster9: 
+				if (y==True) or (Si==True): return 'monster09'
 				else: return 'f_black2'
 			elif P==self.cKey: 
-				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'key01'
+				if (y==True) or (Si==True): return 'key01'
 				else: return 'f_black2'
 			elif P==self.cDoor: 
-				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'door01'
+				if (y==True) or (Si==True): return 'door01'
 				else: return 'f_black2'
 			elif P==self.cLife: 
-				if (y==True) or (tfalse(SettingG("show-items"))==True): return 'life01'
+				if (y==True) or (Si==True): return 'life01'
 				else: return 'f_black2'
 			else: return defaultMissing
 		except: return defaultMissing
@@ -257,7 +330,7 @@ class MyWindow(xbmcgui.Window):
 		
 		self.makeVisualItem("I","L2C0",l+(w*0),t+(h*2),w,h,visImg=initVis)
 		self.makeVisualItem("B","L2C1",l+(w*1),t+(h*2),w,h,visImg=initVis)
-		self.makeVisualItem("I","L2C2",l+(w*2),t+(h*2),w,h,visImg='f_seagreen')
+		self.makeVisualItem("I","L2C2",l+(w*2),t+(h*2),w,h,visImg=self.checkData(self.PuzzleFileHolder.index(self.cUser))) #'f_seagreen')
 		self.makeVisualItem("B","L2C3",l+(w*3),t+(h*2),w,h,visImg=initVis)
 		self.makeVisualItem("I","L2C4",l+(w*4),t+(h*2),w,h,visImg=initVis)
 		
@@ -317,13 +390,11 @@ class MyWindow(xbmcgui.Window):
 		elif self.PuzzleFileHolder[NewPos]==self.cStart: MoveValid=True; 
 		#
 		#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
-		elif self.PuzzleFileHolder[NewPos]==self.cMonster: 
-			SFX('hit_with_frying_pan_y'); 
-			self.gameLifes=self.gameLifes-1; deb('Found','Monster'); 
-			if self.gameLifes > 0:
-				splash.do_My_Splash(artp('dead_halo_smiley'),1,True,(self.scr['W']-(256*2))/2,(self.scr['H']-(256*2))/2,(256*2),(256*2)); 
-			#self.gameMonstersLostTo=self.gameMonstersLostTo+1; 
-			#self.gameMonstersKilled=self.gameMonstersKilled+1; 
+		#elif self.PuzzleFileHolder[NewPos]==self.cMonster: 
+		elif self.PuzzleFileHolder[NewPos] in [self.cMonster,self.cMonster0,self.cMonster1,self.cMonster2,self.cMonster3,self.cMonster4,self.cMonster5,self.cMonster6,self.cMonster7,self.cMonster8,self.cMonster9]: 
+			self.gameLifes=self.gameLifes-1; deb('Found Monster',str(self.PuzzleFileHolder[NewPos])); 
+			if self.gameLifes > 0: SFX('hit_with_frying_pan_y'); splash.do_My_Splash(artp('dead_halo_smiley'),1,True,(self.scr['W']-(256*2))/2,(self.scr['H']-(256*2))/2,(256*2),(256*2)); 
+			#self.gameMonstersLostTo=self.gameMonstersLostTo+1; #self.gameMonstersKilled=self.gameMonstersKilled+1; 
 			self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
 			MoveValid=True; 
 		elif self.PuzzleFileHolder[NewPos]==self.cKey: 

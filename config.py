@@ -17,6 +17,7 @@ class Config:
 	addon=_addon
 	handle=0
 	name=gAI('name'); 
+	name2=gAI('name') +":  "+"[COLOR seagreen]Sleeping Monsters[/COLOR]"; 
 	#name="XBMCHUB Repositories Browser"; 
 	path=gAI('path'); 
 	#profile=xbmc.translatePath(gAI('profile'))
