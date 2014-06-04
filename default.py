@@ -18,13 +18,17 @@ def SFX(n,e='.wav'):
 		except: pass
 
 class MyWindow(xbmcgui.Window):
-	button={}; Mistakes=0; NoOfMoves=0; 
+	visuals={}; button={}; Mistakes=0; NoOfMoves=0; 
 	countA=0; countB=0; LineLength=0; 
-	cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
+	MazeFont='font10'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
+	MazeVisL=630; MazeVisT=20; WH=64*2; 
+	##
 	tWinner='winner'; GridButton={}; GridButtonUD={}; GridButtonUDC={}; GridButtonUDN={}; 
 	Hands=[1,2,3];
 	PuzzleGridA=''; PuzzleGridB=''; PuzzleWordList=''; PuzzleFileHolder=''; 
 	def __init__(self):
+		self.MazeVisW=self.WH; self.MazeVisH=self.WH; 
+		##
 		self.Fanart=(xbmc.translatePath(Config.fanart)); self.b1=artp("black1"); self.current=0; self.content=[]; self.scr={}; self.scr['L']=0; self.scr['T']=0; self.scr['W']=1280; self.scr['H']=720; 
 		self.AniTime=' time=2000 '; self.AniEnd=' end=80 '; 
 		#note("HUB-HUG Movement Series","Please wait.  Preparing screen.  Load Time may vary from device to device.",delay=10000); 
@@ -75,7 +79,7 @@ class MyWindow(xbmcgui.Window):
 		w=self.scr['W']-(l*2); h=self.scr['H']-(t*2); 
 		w=self.scr['W']-(l+t-10); 
 		self.HoroTxtBG=xbmcgui.ControlButton(l,t,w,h,"",textColor="0xFF000000",focusedColor="0xFF00BFFF",alignment=2,focusTexture=self.b1,noFocusTexture=self.b1); 
-		self.HoroTxt=xbmcgui.ControlTextBox(l+10,t+2,w-20,h-4,font='font14',textColor="0xFFFFFFFF"); 
+		self.HoroTxt=xbmcgui.ControlTextBox(l+10,t+2,w-20,h-4,font=self.MazeFont,textColor="0xFFFFFFFF"); 
 		zz=[self.HoroTxtBG,self.HoroTxt]
 		for z in zz: self.addControl(z); #z.setAnimations([('WindowOpen','effect=fade delay=2000 time=2000 start=0 end=80')]); 
 		self.HoroTxtBG.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0 end=90')]); 
@@ -98,22 +102,144 @@ class MyWindow(xbmcgui.Window):
 		#for z in zz: z.controlUp(bZ); z.controlLeft(bZ); z.controlRight(bZ); z.controlDown(bZ); 
 		## ### ## Focus
 		#self.setFocus(self.button[0])
-		self.setFocus(self.HoroTxtBG)
+		self.setFocus(self.HoroTxtBG); 
 		## ### ## 
-		self.PrepareMaze(self.PuzzleFileHolder)
+		self.makeVisualItems(); 
+		if (tfalse(SettingG("show-map"))==True): self.PrepareMaze(self.PuzzleFileHolder); 
+		self.displayVisualItems(self.PuzzleFileHolder.index(self.cUser)); 
 		## ### ## 
+	def displayVisualItem(self,iTag,visImg='f_black2'):
+		visImg=artp(visImg); 
+		#try: 
+		self.visuals[iTag].setImage(visImg,True);
+		#except: 
+		#	try: self.visuals[iTag].setImage(visImg,True);
+		#	except: pass
+		
+	def checkData(self,Pos):
+		defaultMissing='ThumbShadow'; 
+		if Pos < 0: return defaultMissing
+		if Pos > len(self.PuzzleFileHolder): return defaultMissing
+		try:
+			P=self.PuzzleFileHolder[Pos]; 
+			#deb(str(Pos),P); 
+			if   P==self.cWall: return 'f_purple'
+			elif P==self.cEnd: return 'home-favourites-FO_red'
+			elif P==self.cStart: return 'home-power-FO_green'
+			elif P==self.cPath: return 'f_black2'
+			elif P==self.cUser: return 'f_seagreen'
+			else: return defaultMissing
+		except: return defaultMissing
+		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+	def displayVisualItems(self,NewPos):
+		self.displayVisualItem('L0C0',self.checkData( NewPos-((self.LineLength+1)*2)-2 )); 
+		self.displayVisualItem('L0C1',self.checkData( NewPos-((self.LineLength+1)*2)-1 )); 
+		self.displayVisualItem('L0C2',self.checkData( NewPos-((self.LineLength+1)*2)-0 )); 
+		self.displayVisualItem('L0C3',self.checkData( NewPos-((self.LineLength+1)*2)+1 )); 
+		self.displayVisualItem('L0C4',self.checkData( NewPos-((self.LineLength+1)*2)+2 )); 
+		
+		self.displayVisualItem('L1C0',self.checkData( NewPos-((self.LineLength+1)*1)-2 )); 
+		self.displayVisualItem('L1C1',self.checkData( NewPos-((self.LineLength+1)*1)-1 )); 
+		self.displayVisualItem('L1C2',self.checkData( NewPos-((self.LineLength+1)*1)-0 )); 
+		self.displayVisualItem('L1C3',self.checkData( NewPos-((self.LineLength+1)*1)+1 )); 
+		self.displayVisualItem('L1C4',self.checkData( NewPos-((self.LineLength+1)*1)+2 )); 
+		
+		self.displayVisualItem('L2C0',self.checkData( NewPos-((self.LineLength+1)*0)-2 )); 
+		self.displayVisualItem('L2C1',self.checkData( NewPos-((self.LineLength+1)*0)-1 )); 
+		self.displayVisualItem('L2C2',self.checkData( NewPos )); 
+		self.displayVisualItem('L2C3',self.checkData( NewPos-((self.LineLength+1)*0)+1 )); 
+		self.displayVisualItem('L2C4',self.checkData( NewPos-((self.LineLength+1)*0)+2 )); 
+		
+		self.displayVisualItem('L3C0',self.checkData( NewPos+((self.LineLength+1)*1)-2 )); 
+		self.displayVisualItem('L3C1',self.checkData( NewPos+((self.LineLength+1)*1)-1 )); 
+		self.displayVisualItem('L3C2',self.checkData( NewPos+((self.LineLength+1)*1)-0 )); 
+		self.displayVisualItem('L3C3',self.checkData( NewPos+((self.LineLength+1)*1)+1 )); 
+		self.displayVisualItem('L3C4',self.checkData( NewPos+((self.LineLength+1)*1)+2 )); 
+		
+		self.displayVisualItem('L4C0',self.checkData( NewPos+((self.LineLength+1)*2)-2 )); 
+		self.displayVisualItem('L4C1',self.checkData( NewPos+((self.LineLength+1)*2)-1 )); 
+		self.displayVisualItem('L4C2',self.checkData( NewPos+((self.LineLength+1)*2)-0 )); 
+		self.displayVisualItem('L4C3',self.checkData( NewPos+((self.LineLength+1)*2)+1 )); 
+		self.displayVisualItem('L4C4',self.checkData( NewPos+((self.LineLength+1)*2)+2 )); 
+		
+		zz=[['L1C2B',( NewPos-((self.LineLength+1)*1)-0 )],['L2C1B',( NewPos-((self.LineLength+1)*0)-1 )],['L2C3B',( NewPos-((self.LineLength+1)*0)+1 )],['L3C2B',( NewPos+((self.LineLength+1)*1)-0 )]]
+		for iTag,Pos in zz:
+			try:
+				P=self.PuzzleFileHolder[Pos]; 
+				if   (P==self.cPath): self.visuals[iTag].setVisible(True)
+				elif (P==self.cEnd): self.visuals[iTag].setVisible(True)
+				elif (P==self.cStart): self.visuals[iTag].setVisible(True)
+				elif (P==self.cPath): self.visuals[iTag].setVisible(True)
+				elif (P==self.cWall): self.visuals[iTag].setVisible(False)
+				else: self.visuals[iTag].setVisible(False)
+			except: self.visuals[iTag].setVisible(False)
+		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+		#self.LineLength
+		#return
+	def makeVisualItem(self,Type,iTag,l,t,w,h,visImg='f_black2'):
+		visImg=artp(visImg); visImgB=artp('OverlayWatched_orange'); 
+		if Type.upper()=='B':
+			self.visuals[iTag]=xbmcgui.ControlImage(l,t,w,h,visImg,aspectRatio=0); 
+			self.addControl(self.visuals[iTag])
+			self.visuals[iTag+'B']=xbmcgui.ControlButton(l,t,w,h,"",textColor="0xFF000000",focusedColor="0xFF00BFFF",alignment=2,focusTexture=visImgB,noFocusTexture=visImgB); 
+			self.addControl(self.visuals[iTag+'B'])
+			self.visuals[iTag].setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
+			self.visuals[iTag+'B'].setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
+		elif Type.upper()=='I':
+			self.visuals[iTag]=xbmcgui.ControlImage(l,t,w,h,visImg,aspectRatio=0); 
+			self.addControl(self.visuals[iTag])
+			self.visuals[iTag].setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
+		else: return
+	def makeVisualItems(self):
+		initVis='f_black2'; w=self.MazeVisW; h=self.MazeVisH; l=self.MazeVisL; t=self.MazeVisT; 
+		self.makeVisualItem("I","L0C0",l+(w*0),t+(h*0),w,h,visImg=initVis)
+		self.makeVisualItem("I","L0C1",l+(w*1),t+(h*0),w,h,visImg=initVis)
+		self.makeVisualItem("I","L0C2",l+(w*2),t+(h*0),w,h,visImg=initVis)
+		self.makeVisualItem("I","L0C3",l+(w*3),t+(h*0),w,h,visImg=initVis)
+		self.makeVisualItem("I","L0C4",l+(w*4),t+(h*0),w,h,visImg=initVis)
+		
+		self.makeVisualItem("I","L1C0",l+(w*0),t+(h*1),w,h,visImg=initVis)
+		self.makeVisualItem("I","L1C1",l+(w*1),t+(h*1),w,h,visImg=initVis)
+		self.makeVisualItem("B","L1C2",l+(w*2),t+(h*1),w,h,visImg=initVis)
+		self.makeVisualItem("I","L1C3",l+(w*3),t+(h*1),w,h,visImg=initVis)
+		self.makeVisualItem("I","L1C4",l+(w*4),t+(h*1),w,h,visImg=initVis)
+		
+		self.makeVisualItem("I","L2C0",l+(w*0),t+(h*2),w,h,visImg=initVis)
+		self.makeVisualItem("B","L2C1",l+(w*1),t+(h*2),w,h,visImg=initVis)
+		self.makeVisualItem("I","L2C2",l+(w*2),t+(h*2),w,h,visImg='f_seagreen')
+		self.makeVisualItem("B","L2C3",l+(w*3),t+(h*2),w,h,visImg=initVis)
+		self.makeVisualItem("I","L2C4",l+(w*4),t+(h*2),w,h,visImg=initVis)
+		
+		self.makeVisualItem("I","L3C0",l+(w*0),t+(h*3),w,h,visImg=initVis)
+		self.makeVisualItem("I","L3C1",l+(w*1),t+(h*3),w,h,visImg=initVis)
+		self.makeVisualItem("B","L3C2",l+(w*2),t+(h*3),w,h,visImg=initVis)
+		self.makeVisualItem("I","L3C3",l+(w*3),t+(h*3),w,h,visImg=initVis)
+		self.makeVisualItem("I","L3C4",l+(w*4),t+(h*3),w,h,visImg=initVis)
+		
+		self.makeVisualItem("I","L4C0",l+(w*0),t+(h*4),w,h,visImg=initVis)
+		self.makeVisualItem("I","L4C1",l+(w*1),t+(h*4),w,h,visImg=initVis)
+		self.makeVisualItem("I","L4C2",l+(w*2),t+(h*4),w,h,visImg=initVis)
+		self.makeVisualItem("I","L4C3",l+(w*3),t+(h*4),w,h,visImg=initVis)
+		self.makeVisualItem("I","L4C4",l+(w*4),t+(h*4),w,h,visImg=initVis)
 	def onAction(self,action):
 		try: F=self.getFocus()
 		except: F=False
 		if   action == Config.ACTION_PREVIOUS_MENU: self.CloseWindow1st()
 		elif action == Config.ACTION_NAV_BACK: self.CloseWindow1st()
-		elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
+		else:
+		#elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
 			try: self.DoFight(action,F)
 			except: pass
 	def onControl(self,control):
 		if   control==self.button[0]: self.CloseWindow1st()
 		#elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
-		#else:
+		else:
+			try:
+				if self.visuals['L1C2B']==control: self.onAction(Config.ACTION_MOVE_UP)
+				if self.visuals['L2C1B']==control:self.onAction(Config.ACTION_MOVE_LEFT)
+				if self.visuals['L2C3B']==control:self.onAction(Config.ACTION_MOVE_RIGHT)
+				if self.visuals['L3C2B']==control:self.onAction(Config.ACTION_MOVE_DOWN)
+			except: pass
 		##
 	def DoFight(self,action,F):
 		#self.LineLength
@@ -157,8 +283,9 @@ class MyWindow(xbmcgui.Window):
 			#self.PuzzleFileHolder[NewPos]=self.cUser
 			if self.PuzzleFileHolder_Original[NewPos]==self.cEnd: 
 				self.VictoryDance(); 
-			self.PuzzleFileHolder=self.PuzzleFileHolder[0:NewPos]+self.cUser+self.PuzzleFileHolder[NewPos+1:len(self.PuzzleFileHolder)]
-			self.PrepareMaze(self.PuzzleFileHolder)
+			self.PuzzleFileHolder=self.PuzzleFileHolder[0:NewPos]+self.cUser+self.PuzzleFileHolder[NewPos+1:len(self.PuzzleFileHolder)]; 
+			if (tfalse(SettingG("show-map"))==True) and (tfalse(SettingG("show-maplocation"))==True): self.PrepareMaze(self.PuzzleFileHolder); 
+			self.displayVisualItems(NewPos); 
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
 	def VictoryDance(self):
 		try:

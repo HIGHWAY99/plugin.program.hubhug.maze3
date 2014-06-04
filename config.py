@@ -1,7 +1,7 @@
 ## from config import Config as Config
 
 import xbmc,xbmcaddon,xbmcplugin,os
-_addon_id="plugin.program.hubhug.maze"; _addon_name="HUB-HUG Exit The Maze"; 
+_addon_id="plugin.program.hubhug.maze2"; _addon_name="HUB-HUG Exit The Maze 2"; 
 _addon=xbmcaddon.Addon(id=_addon_id); 
 
 def gAI(t):
