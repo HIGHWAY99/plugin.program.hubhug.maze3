@@ -18,14 +18,16 @@ def SFX(n,e='.wav'):
 		except: pass
 
 class MyWindow(xbmcgui.Window):
-	visuals={}; button={}; Mistakes=0; NoOfMoves=0; 
+	visuals={}; button={}; Mistakes=0; NoOfMoves=0; tagUp="UP"; tagLeft="LEFT"; tagRight="RIGHT"; tagDown="DOWN"; 
 	countA=0; countB=0; LineLength=0; 
 	MazeFont='font10'; MazeFont2='font14'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
 	cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; 
 	cMonster0='0'; cMonster1='1'; cMonster2='2'; cMonster3='3'; cMonster4='4'; cMonster5='5'; cMonster6='6'; cMonster7='7'; cMonster8='8'; cMonster9='9'; 
-	StatsMsg='Level: %s   Life: %s   Keys: %s   Battle Wins: %s   Battle Losses: %s   '
+	StatsMsg='Level: %s   Life: %s   Keys: %s   ' #Battle Wins: %s   Battle Losses: %s   '
 	#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
-	MazeVisL=630; MazeVisT=20; WH=64*2; 
+	MazeVisL=430; MazeVisT=20; WH=60; #*2; 
+	VisGridSizeH=5; ## # | # (Number / 2) - 1 = VisGridSizeH # Number of positions down.   # ##
+	VisGridSizeV=9; ## # - # (Number / 2) - 1 = VisGridSizeV # Number of positions across. # ##
 	##
 	gameLevel=0; gameLifes=1; gameKeys=0; gameMonstersKilled=0; gameMonstersLostTo=0; 
 	##
@@ -33,9 +35,17 @@ class MyWindow(xbmcgui.Window):
 	Hands=[1,2,3];
 	PuzzleGridA=''; PuzzleGridB=''; PuzzleWordList=''; PuzzleFileHolder=''; 
 	def __init__(self):
-		self.MazeVisW=self.WH; self.MazeVisH=self.WH; 
+		vsW=SettingG("viz-scale-width"); vsH=SettingG("viz-scale-height"); 
+		try: self.VisGridSizeV=(int(vsW)-1)/2
+		except: pass
+		try: self.VisGridSizeH=(int(vsH)-1)/2
+		except: pass
 		##
 		self.Fanart=(xbmc.translatePath(Config.fanart)); self.b1=artp("black1"); self.current=0; self.content=[]; self.scr={}; self.scr['L']=0; self.scr['T']=0; self.scr['W']=1280; self.scr['H']=720; 
+		##
+		self.MazeVisW=self.WH; self.MazeVisH=self.WH; 
+		self.MazeVisL=self.scr['W']-10-(self.MazeVisW*((self.VisGridSizeV*2)+1))
+		
 		self.AniTime=' time=2000 '; self.AniEnd=' end=80 '; 
 		#note("HUB-HUG Movement Series","Please wait.  Preparing screen.  Load Time may vary from device to device.",delay=10000); 
 		self.LoadGridFile(); 
@@ -110,7 +120,8 @@ class MyWindow(xbmcgui.Window):
 		t=t.replace('[color ','[COLOR ').replace('[/color]','[/COLOR]')
 		self.PuzzleFileHolder_Publish=t
 		self.HoroTxt.setText(self.PuzzleFileHolder_Publish)
-		self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
+		self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys)) ); 
+		#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 	def makePageItems(self):
 		focus=artp("button-focus_lightblue"); nofocus=artp("button-focus_seagreen"); self.background=self.Fanart; #self.background=artj("backdrop_temp"); 
 		## ### ## Background
@@ -180,13 +191,24 @@ class MyWindow(xbmcgui.Window):
 						#,'':				''
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'
-	def checkData(self,Pos):
+	def checkData(self,Pos,zV=0,zH=0):
 		defaultMissing='f_purple'; #'ThumbShadow'; 
 		if Pos < 0: return defaultMissing
 		if Pos > len(self.PuzzleFileHolder): return defaultMissing
 		try:
 			P=self.PuzzleFileHolder[Pos]; 
 			CurPos=self.PuzzleFileHolder.index(self.cUser)
+			if not P==self.cWall:
+				#MidPosOfLine=(CurPos+(zH*self.LineLength+1))
+				#ShouldBePos=(CurPos+(zH*self.LineLength+1))+zV
+				if (zV < 0):
+						try: segMent=self.PuzzleFileHolder[Pos:Pos-(zV)]
+						except: segMent=""
+						if ('\n' in segMent): return defaultMissing #deb('Before Avatar',str(Pos)+'  '+str(zH)+'  '+str(zV)); deb(str(Pos)+' to '+str(MidPosOfLine)+' for '+str(len(segMent)),'"'+str(segMent)+'"'); deb('Location',str(Pos)+'  '+str(zH)+'  '+str(zV)); 
+				if (zV > 0):
+						try: segMent=self.PuzzleFileHolder[Pos-(zV):Pos]
+						except: segMent=""
+						if ('\n' in segMent): return defaultMissing #deb('After  Avatar',str(Pos)+'  '+str(zH)+'  '+str(zV)); deb(str(MidPosOfLine)+' to '+str(Pos)+' for '+str(len(segMent)),'"'+str(segMent)+'"'); deb('Location',str(Pos)+'  '+str(zH)+'  '+str(zV)); 
 			if   Pos==(CurPos-(self.LineLength+1)): y=True
 			elif Pos==(CurPos-(1)): y=True
 			elif Pos==(CurPos+(1)): y=True
@@ -256,37 +278,16 @@ class MyWindow(xbmcgui.Window):
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
 		#self.cMonster='R'; self.cKey='K'; self.cDoor='D'; self.cLife='L'; 
 	def displayVisualItems(self,NewPos):
-		self.displayVisualItem('L0C0',self.checkData( NewPos-((self.LineLength+1)*2)-2 )); 
-		self.displayVisualItem('L0C1',self.checkData( NewPos-((self.LineLength+1)*2)-1 )); 
-		self.displayVisualItem('L0C2',self.checkData( NewPos-((self.LineLength+1)*2)-0 )); 
-		self.displayVisualItem('L0C3',self.checkData( NewPos-((self.LineLength+1)*2)+1 )); 
-		self.displayVisualItem('L0C4',self.checkData( NewPos-((self.LineLength+1)*2)+2 )); 
-		
-		self.displayVisualItem('L1C0',self.checkData( NewPos-((self.LineLength+1)*1)-2 )); 
-		self.displayVisualItem('L1C1',self.checkData( NewPos-((self.LineLength+1)*1)-1 )); 
-		self.displayVisualItem('L1C2',self.checkData( NewPos-((self.LineLength+1)*1)-0 )); 
-		self.displayVisualItem('L1C3',self.checkData( NewPos-((self.LineLength+1)*1)+1 )); 
-		self.displayVisualItem('L1C4',self.checkData( NewPos-((self.LineLength+1)*1)+2 )); 
-		
-		self.displayVisualItem('L2C0',self.checkData( NewPos-((self.LineLength+1)*0)-2 )); 
-		self.displayVisualItem('L2C1',self.checkData( NewPos-((self.LineLength+1)*0)-1 )); 
-		self.displayVisualItem('L2C2',self.checkData( NewPos )); 
-		self.displayVisualItem('L2C3',self.checkData( NewPos-((self.LineLength+1)*0)+1 )); 
-		self.displayVisualItem('L2C4',self.checkData( NewPos-((self.LineLength+1)*0)+2 )); 
-		
-		self.displayVisualItem('L3C0',self.checkData( NewPos+((self.LineLength+1)*1)-2 )); 
-		self.displayVisualItem('L3C1',self.checkData( NewPos+((self.LineLength+1)*1)-1 )); 
-		self.displayVisualItem('L3C2',self.checkData( NewPos+((self.LineLength+1)*1)-0 )); 
-		self.displayVisualItem('L3C3',self.checkData( NewPos+((self.LineLength+1)*1)+1 )); 
-		self.displayVisualItem('L3C4',self.checkData( NewPos+((self.LineLength+1)*1)+2 )); 
-		
-		self.displayVisualItem('L4C0',self.checkData( NewPos+((self.LineLength+1)*2)-2 )); 
-		self.displayVisualItem('L4C1',self.checkData( NewPos+((self.LineLength+1)*2)-1 )); 
-		self.displayVisualItem('L4C2',self.checkData( NewPos+((self.LineLength+1)*2)-0 )); 
-		self.displayVisualItem('L4C3',self.checkData( NewPos+((self.LineLength+1)*2)+1 )); 
-		self.displayVisualItem('L4C4',self.checkData( NewPos+((self.LineLength+1)*2)+2 )); 
-		
-		zz=[['L1C2B',( NewPos-((self.LineLength+1)*1)-0 )],['L2C1B',( NewPos-((self.LineLength+1)*0)-1 )],['L2C3B',( NewPos-((self.LineLength+1)*0)+1 )],['L3C2B',( NewPos+((self.LineLength+1)*1)-0 )]]
+		i=0; i2=self.VisGridSizeH; zzH=[]
+		for i3 in range((0-i2),i2+1): zzH.append((i,i3)); i+=1; 
+		i=0; i2=self.VisGridSizeV; zzV=[]
+		for i3 in range((0-i2),i2+1): zzV.append((i,i3)); i+=1; 
+		for (zL,zH) in zzH:
+			for (zC,zV) in zzV:
+				Pos=NewPos+((self.LineLength+1)*zH)+zV
+				self.displayVisualItem('L'+str(zL)+'C'+str(zC),self.checkData( Pos,zV,zH )); 
+		zz=[[self.tagUp,( NewPos-((self.LineLength+1)*1) )],[self.tagLeft,( NewPos-1 )],[self.tagRight,( NewPos+1 )],[self.tagDown,( NewPos+((self.LineLength+1)*1) )]]
+		#debob(zz); 
 		for iTag,Pos in zz:
 			try:
 				P=self.PuzzleFileHolder[Pos]; 
@@ -295,6 +296,11 @@ class MyWindow(xbmcgui.Window):
 				elif (P==self.cStart): self.visuals[iTag].setVisible(True)
 				elif (P==self.cPath): self.visuals[iTag].setVisible(True)
 				elif (P==self.cWall): self.visuals[iTag].setVisible(False)
+				elif (P in [self.cLife,self.cKey]): self.visuals[iTag].setVisible(True)
+				elif (P in [self.cMonster,self.cMonster0,self.cMonster1,self.cMonster2,self.cMonster3,self.cMonster4,self.cMonster5,self.cMonster6,self.cMonster7,self.cMonster8,self.cMonster9]): self.visuals[iTag].setVisible(True)
+				elif (P==self.cDoor): 
+					if self.gameKeys > 0: self.visuals[iTag].setVisible(True)
+					else: self.visuals[iTag].setVisible(False)
 				else: self.visuals[iTag].setVisible(False)
 			except: self.visuals[iTag].setVisible(False)
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
@@ -302,6 +308,7 @@ class MyWindow(xbmcgui.Window):
 		#return
 	def makeVisualItem(self,Type,iTag,l,t,w,h,visImg='f_black2'):
 		visImg=artp(visImg); visImgB=artp('OverlayWatched_orange'); 
+		#debob([Type,iTag,l,t,w,h,visImg]); 
 		if Type.upper()=='B':
 			self.visuals[iTag]=xbmcgui.ControlImage(l,t,w,h,visImg,aspectRatio=0); 
 			self.addControl(self.visuals[iTag])
@@ -316,35 +323,26 @@ class MyWindow(xbmcgui.Window):
 		else: return
 	def makeVisualItems(self):
 		initVis='f_black2'; w=self.MazeVisW; h=self.MazeVisH; l=self.MazeVisL; t=self.MazeVisT; 
-		self.makeVisualItem("I","L0C0",l+(w*0),t+(h*0),w,h,visImg=initVis)
-		self.makeVisualItem("I","L0C1",l+(w*1),t+(h*0),w,h,visImg=initVis)
-		self.makeVisualItem("I","L0C2",l+(w*2),t+(h*0),w,h,visImg=initVis)
-		self.makeVisualItem("I","L0C3",l+(w*3),t+(h*0),w,h,visImg=initVis)
-		self.makeVisualItem("I","L0C4",l+(w*4),t+(h*0),w,h,visImg=initVis)
-		
-		self.makeVisualItem("I","L1C0",l+(w*0),t+(h*1),w,h,visImg=initVis)
-		self.makeVisualItem("I","L1C1",l+(w*1),t+(h*1),w,h,visImg=initVis)
-		self.makeVisualItem("B","L1C2",l+(w*2),t+(h*1),w,h,visImg=initVis)
-		self.makeVisualItem("I","L1C3",l+(w*3),t+(h*1),w,h,visImg=initVis)
-		self.makeVisualItem("I","L1C4",l+(w*4),t+(h*1),w,h,visImg=initVis)
-		
-		self.makeVisualItem("I","L2C0",l+(w*0),t+(h*2),w,h,visImg=initVis)
-		self.makeVisualItem("B","L2C1",l+(w*1),t+(h*2),w,h,visImg=initVis)
-		self.makeVisualItem("I","L2C2",l+(w*2),t+(h*2),w,h,visImg=self.checkData(self.PuzzleFileHolder.index(self.cUser))) #'f_seagreen')
-		self.makeVisualItem("B","L2C3",l+(w*3),t+(h*2),w,h,visImg=initVis)
-		self.makeVisualItem("I","L2C4",l+(w*4),t+(h*2),w,h,visImg=initVis)
-		
-		self.makeVisualItem("I","L3C0",l+(w*0),t+(h*3),w,h,visImg=initVis)
-		self.makeVisualItem("I","L3C1",l+(w*1),t+(h*3),w,h,visImg=initVis)
-		self.makeVisualItem("B","L3C2",l+(w*2),t+(h*3),w,h,visImg=initVis)
-		self.makeVisualItem("I","L3C3",l+(w*3),t+(h*3),w,h,visImg=initVis)
-		self.makeVisualItem("I","L3C4",l+(w*4),t+(h*3),w,h,visImg=initVis)
-		
-		self.makeVisualItem("I","L4C0",l+(w*0),t+(h*4),w,h,visImg=initVis)
-		self.makeVisualItem("I","L4C1",l+(w*1),t+(h*4),w,h,visImg=initVis)
-		self.makeVisualItem("I","L4C2",l+(w*2),t+(h*4),w,h,visImg=initVis)
-		self.makeVisualItem("I","L4C3",l+(w*3),t+(h*4),w,h,visImg=initVis)
-		self.makeVisualItem("I","L4C4",l+(w*4),t+(h*4),w,h,visImg=initVis)
+		self.makeVisualItem("I","BG",l,t,w*((self.VisGridSizeV*2)+1),h*((self.VisGridSizeH*2)+1),visImg='black1')
+		#i=0; i2=self.VisGridSizeH; 
+		#for i3 in range((0-i2),i2+1): zzH.append((i,i3)); i+=1; 
+		#i=0; i2=self.VisGridSizeV; 
+		#for i3 in range((0-i2),i2+1): zzV.append((i,i3)); i+=1; 
+		## ((self.VisGridSizeV*2)+1))
+		for hN in range(0,((self.VisGridSizeH*2)+1)):
+			for wN in range(0,((self.VisGridSizeV*2)+1)):
+				if   (hN==(self.VisGridSizeH-1)) and (wN==(self.VisGridSizeV)):
+					iORb="B"; self.tagUp="L"+str(hN)+"C"+str(wN)+'B'; 
+				elif (hN==(self.VisGridSizeH)) and (wN==(self.VisGridSizeV-1)):
+					iORb="B"; self.tagLeft="L"+str(hN)+"C"+str(wN)+'B'; 
+				elif (hN==(self.VisGridSizeH)) and (wN==(self.VisGridSizeV+1)):
+					iORb="B"; self.tagRight="L"+str(hN)+"C"+str(wN)+'B'; 
+				elif (hN==(self.VisGridSizeH+1)) and (wN==(self.VisGridSizeV)):
+					iORb="B"; self.tagDown="L"+str(hN)+"C"+str(wN)+'B'; 
+				else: iORb="I"
+				self.makeVisualItem(iORb,"L"+str(hN)+"C"+str(wN),l+(w*wN),t+(h*hN),w,h,visImg=initVis); 
+		debob([self.tagUp,self.tagLeft,self.tagRight,self.tagDown]); 
+		##
 	def onAction(self,action):
 		try: F=self.getFocus()
 		except: F=False
@@ -360,10 +358,10 @@ class MyWindow(xbmcgui.Window):
 		#elif (F==self.HoroTxtBG) or (F==self.HoroTxtBG):
 		else:
 			try:
-				if self.visuals['L1C2B']==control: self.onAction(Config.ACTION_MOVE_UP)
-				if self.visuals['L2C1B']==control:self.onAction(Config.ACTION_MOVE_LEFT)
-				if self.visuals['L2C3B']==control:self.onAction(Config.ACTION_MOVE_RIGHT)
-				if self.visuals['L3C2B']==control:self.onAction(Config.ACTION_MOVE_DOWN)
+				if self.visuals[self.tagUp]==control: self.onAction(Config.ACTION_MOVE_UP)
+				if self.visuals[self.tagLeft]==control:self.onAction(Config.ACTION_MOVE_LEFT)
+				if self.visuals[self.tagRight]==control:self.onAction(Config.ACTION_MOVE_RIGHT)
+				if self.visuals[self.tagDown]==control:self.onAction(Config.ACTION_MOVE_DOWN)
 			except: pass
 		##
 	def DoFight(self,action,F):
