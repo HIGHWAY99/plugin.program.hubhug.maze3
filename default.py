@@ -181,7 +181,7 @@ class MyWindow(xbmcgui.Window):
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'
 	def checkData(self,Pos):
-		defaultMissing='ThumbShadow'; 
+		defaultMissing='f_purple'; #'ThumbShadow'; 
 		if Pos < 0: return defaultMissing
 		if Pos > len(self.PuzzleFileHolder): return defaultMissing
 		try:
