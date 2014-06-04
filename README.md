@@ -1,6 +1,7 @@
 plugin.program.hubhug.maze3
 ===========================
-[COLOR deepskyblue][B][I]HUB-HUG[/I][/B][/COLOR]  [CR] Exit The Maze 3:  [COLOR seagreen]Sleeping Monsters[/COLOR]
+HUB-HUG
+Exit The Maze 3:  Sleeping Monsters
 ===========================
 $  - User
 S  - Start
