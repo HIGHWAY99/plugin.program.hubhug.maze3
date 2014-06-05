@@ -21,15 +21,17 @@ class MyWindow(xbmcgui.Window):
 	visuals={}; button={}; Mistakes=0; NoOfMoves=0; tagUp="UP"; tagLeft="LEFT"; tagRight="RIGHT"; tagDown="DOWN"; 
 	countA=0; countB=0; LineLength=0; 
 	MazeFont='font10'; MazeFont2='font14'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
-	cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; 
+	csMap='O'; cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; cToStart='s'; cMyLove='Y'
 	cMonster0='0'; cMonster1='1'; cMonster2='2'; cMonster3='3'; cMonster4='4'; cMonster5='5'; cMonster6='6'; cMonster7='7'; cMonster8='8'; cMonster9='9'; 
+	cPortalFA='A'; cPortalTA='a'; cPortalFP='P'; cPortalTP='p'; cPortalFO='O'; cPortalTO='o'; cPortalFQ='Q'; cPortalTQ='q'; cPortalFU='U'; cPortalTU='u'; cPortalFJ='J'; cPortalTJ='j'; 
+	
 	StatsMsg='Level: %s   Life: %s   Keys: %s   ' #Battle Wins: %s   Battle Losses: %s   '
 	#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 	MazeVisL=430; MazeVisT=20; WH=60; #*2; 
 	VisGridSizeH=5; ## # | # (Number / 2) - 1 = VisGridSizeH # Number of positions down.   # ##
 	VisGridSizeV=9; ## # - # (Number / 2) - 1 = VisGridSizeV # Number of positions across. # ##
 	##
-	gameLevel=0; gameLifes=1; gameKeys=0; gameMonstersKilled=0; gameMonstersLostTo=0; 
+	gameLevel=0; gameLifes=1; gameKeys=0; gameMonstersKilled=0; gameMonstersLostTo=0; gameMyLove=0; 
 	##
 	tWinner='winner'; GridButton={}; GridButtonUD={}; GridButtonUDC={}; GridButtonUDN={}; 
 	Hands=[1,2,3];
@@ -51,6 +53,7 @@ class MyWindow(xbmcgui.Window):
 		self.LoadGridFile(); 
 		self.makePageItems(); 
 	def LoadGridFile(self):
+		self.gameMyLove=0; 
 		self.PuzzlePath=xbmc.translatePath(os.path.join(Config.path,'puzzles')); 
 		self.PuzzleFiles=os.listdir(self.PuzzlePath); debob(self.PuzzleFiles); 
 		zz=self.PuzzleFiles; 
@@ -71,54 +74,70 @@ class MyWindow(xbmcgui.Window):
 		self.PuzzleFileHolder_Original=''+self.PuzzleFileHolder
 		self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cStart,self.cUser,1)
 		self.LineLength=len(self.PuzzleFileHolder.split('\n')[0]);
+		#if self.LineLength > 60: self.csMap='.'; 
+		#else: self.csMap='O'; 
 		self.gameLevel=self.gameLevel+1; 
 		#self.PrepareMaze(self.PuzzleFileHolder)
 		##
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
 		#self.cMonster='R'; self.cKey='K'; self.cDoor='D'; self.cLife='L'; 
 	def PrepareMaze(self,t):
-		t=t.replace(self.cPath,cFLL(self.cWall,'black'))
-		#t=t.replace(self.cPath,cFLL(self.cWall,'black'))
+		tblack='bbbbb'; c=tblack; 
+		t=t.replace(self.cWall,cFLL(self.cWall,'bbbbbbbbbbbb')); 
+		t=t.replace(self.cPath,cFLL(self.cWall,c)); 
+		zz=[self.cPortalTA,self.cPortalTO,self.cPortalTU,self.cPortalFA,self.cPortalFP,self.cPortalTP,self.cPortalFO,self.cPortalFQ,self.cPortalTQ,self.cPortalFU,self.cPortalFJ,self.cPortalTJ,self.cToStart]; 
+		for z in zz: t=t.replace(z, cFLL(self.cWall,c) )
 		##
 		if (tfalse(SettingG("show-items"))==True): 
-			c='grey' #'black'
-			t=t.replace(self.cLife, cFLL(self.cLife,'maroon') ) 
-			t=t.replace(self.cMonster, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster0, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster1, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster2, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster3, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster4, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster5, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster6, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster7, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster8, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cMonster9, cFLL(self.cMonster,'coral') ) 
-			t=t.replace(self.cDoor, cFLL(self.cDoor,'grey') ) 
-			t=t.replace(self.cKey, cFLL(self.cKey,'yellow') ) 
+			c='bbbb'
+			t=t.replace(self.cLife, cFLL(self.cWall,'bbbbbbbbb') ) 
+			t=t.replace(self.cMonster, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster0, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster1, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster2, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster3, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster4, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster5, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster6, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster7, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster8, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cMonster9, cFLL(self.cWall,'bbbbbbb') ) 
+			t=t.replace(self.cDoor, cFLL(self.cWall,'bbbb') ) 
+			t=t.replace(self.cKey, cFLL(self.cWall,'bbbbbb') ) 
 		else:
-			c='black'
+			c=tblack
 			t=t.replace(self.cLife, cFLL(self.cWall,c) ) 
 			t=t.replace(self.cMonster, cFLL(self.cWall,c) ) 
-			t=t.replace(self.cMonster0, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster1, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster2, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster3, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster4, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster5, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster6, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster7, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster8, cFLL(self.cWall,'c') ) 
-			t=t.replace(self.cMonster9, cFLL(self.cWall,'c') ) 
+			t=t.replace(self.cMonster0, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster1, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster2, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster3, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster4, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster5, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster6, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster7, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster8, cFLL(self.cWall,c) ) 
+			t=t.replace(self.cMonster9, cFLL(self.cWall,c) ) 
 			t=t.replace(self.cDoor, cFLL(self.cWall,c) ) 
 			t=t.replace(self.cKey, cFLL(self.cWall,c) ) 
 		##
-		t=t.replace(self.cUser, cFLL(self.cUser,'lightblue') )
-		t=t.replace(self.cEnd, cFLL(self.cEnd,'red') ) 
-		t=t.replace(self.cStart, cFLL(self.cStart,'green') ) 
-		t=cFL(t,'mediumpurple')
-		t=t.replace('[color ','[COLOR ').replace('[/color]','[/COLOR]')
+		
+		t=t.replace(self.cMyLove, cFLL(self.cWall,tblack) )
+		t=t.replace(self.cUser, cFLL(self.cWall,'bbb') )
+		if (tfalse(SettingG("show-items"))==True): t=t.replace(self.cEnd, cFLL(self.cWall,'bb') ) 
+		else: t=t.replace(self.cEnd, cFLL(self.cWall,'tblack') ) 
+		t=t.replace(self.cStart, cFLL(self.cWall,'bbbbbbbb') ) 
+		t=cFL(t,'mediumpurple'); 
+		t=t.replace('[color_','[COLOR ').replace('[/color]','[/COLOR]'); t=t.replace('[ccccc_','[COLOR ').replace('[/ccccc]','[/COLOR]'); 
+		t=t.replace(' bbbbb]',' black]'); t=t.replace(' bbbb]',' grey]'); 
+		t=t.replace(' bbbbbb]',' yellow]'); t=t.replace(' bbbbbbb]',' coral]'); 
+		t=t.replace(' bbbbbbbb]',' green]'); t=t.replace(' bbb]',' lightblue]'); 
+		t=t.replace(' bb]',' red]'); t=t.replace(' bbbbbbbbb]',' maroon]'); t=t.replace(' bbbbbbbbbbbb]',' mediumpurple]'); 
+		
+		t=t.replace(self.cWall,self.csMap)
+		
 		self.PuzzleFileHolder_Publish=t
+		#debob(self.PuzzleFileHolder_Publish); 
 		self.HoroTxt.setText(self.PuzzleFileHolder_Publish)
 		self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys)) ); 
 		#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
@@ -149,7 +168,7 @@ class MyWindow(xbmcgui.Window):
 		self.HoroTxt2.setAnimations([('WindowOpen','effect=fade delay=4000 time=2000 start=0')]); 
 		
 		## ### ## Addon Title
-		zz=["XBMCHUB","Your","HUB-HUG"]; w=1000; h=50; l=15; t=700; t=560; 
+		zz=["XBMCHUB","Your","HUB-HUG"]; w=1000; h=50; l=15; t=700; t=575; 
 		self.LabTitleText=Config.name2; #self.LabTitleText=Config.name; 
 		self.LabTitle=xbmcgui.ControlLabel(l,t,w,h,'','font30','0xFFFF0000',angle=90); self.addControl(self.LabTitle)
 		for z in zz:
@@ -185,9 +204,20 @@ class MyWindow(xbmcgui.Window):
 				try:
 					return {
 						'SeaGreen':					'SeaGreen'
+						,'AncientHero':			'hero00'
 						,'BlueShades1':			'hero01'
 						,'BlueShades2':			'hero02'
 						,'GreyHuman':				'hero03'
+						,'BlackEyedHero':		'hero04'
+						,'GreenHero':				'hero05'
+						,'NerdHero':				'hero06'
+						,'BanditHero':			'hero07'
+						,'XBMCHero':				'hero08'
+						,'AndroidHero':			'hero09'
+						,'Girl1':					'girl01'
+						,'Girl2':					'girl02'
+						,'GirlNLove':			'girl03'
+						,'HoodedGirl':			'girl04'
 						#,'':				''
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'
@@ -219,14 +249,50 @@ class MyWindow(xbmcgui.Window):
 			if   P==self.cWall: return 'f_purple'
 			elif P==self.cEnd: return 'home-favourites-FO_red'
 			elif P==self.cStart: return 'home-power-FO_green'
-			elif P==self.cPath: return 'f_black2'
+			elif P==self.cPath: return 'black1' #'f_black2'
+			elif P in [self.cPortalFA,self.cPortalFP,self.cPortalFO,self.cPortalFQ,self.cPortalFU,self.cPortalFJ,self.cToStart]: 
+				return 'portal01'
+			elif P in [self.cPortalTA,self.cPortalTP,self.cPortalTO,self.cPortalTQ,self.cPortalTU,self.cPortalTJ]: 
+				return 'portal02'
 			elif P==self.cUser: 
 				try:
 					return {
 						'SeaGreen':					'SeaGreen'
+						,'AncientHero':			'hero00'
 						,'BlueShades1':			'hero01'
 						,'BlueShades2':			'hero02'
 						,'GreyHuman':				'hero03'
+						,'BlackEyedHero':		'hero04'
+						,'GreenHero':				'hero05'
+						,'NerdHero':				'hero06'
+						,'BanditHero':			'hero07'
+						,'XBMCHero':				'hero08'
+						,'AndroidHero':			'hero09'
+						,'Girl1':						'girl01'
+						,'Girl2':						'girl02'
+						,'GirlNLove':				'girl03'
+						,'HoodedGirl':			'girl04'
+						#,'':				''
+					}[SettingG("img-player")]
+				except: return 'f_seagreen'
+			elif P==self.cMyLove: 
+				try:
+					return {
+						'SeaGreen':					'SeaGreen'
+						,'AncientHero':			'girl04' #hero00'
+						,'BlueShades1':			'girl03' #hero01'
+						,'BlueShades2':			'girl01' #hero02'
+						,'GreyHuman':				'girl02' #hero03'
+						,'BlackEyedHero':		'girl01' #hero04'
+						,'GreenHero':				'girl02' #hero05'
+						,'NerdHero':				'girl01' #hero06'
+						,'BanditHero':			'girl02' #hero07'
+						,'XBMCHero':				'hero09' #hero08'
+						,'AndroidHero':			'hero08' #hero09'
+						,'Girl1':						'hero04' #girl01'
+						,'Girl2':						'hero01' #girl02'
+						,'GirlNLove':				'hero06' #girl03'
+						,'HoodedGirl':			'hero00' #girl04'
 						#,'':				''
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'
@@ -274,9 +340,6 @@ class MyWindow(xbmcgui.Window):
 				else: return 'f_black2'
 			else: return defaultMissing
 		except: return defaultMissing
-		#if (tfalse(SettingG("show-items"))==True): 
-		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
-		#self.cMonster='R'; self.cKey='K'; self.cDoor='D'; self.cLife='L'; 
 	def displayVisualItems(self,NewPos):
 		i=0; i2=self.VisGridSizeH; zzH=[]
 		for i3 in range((0-i2),i2+1): zzH.append((i,i3)); i+=1; 
@@ -296,8 +359,9 @@ class MyWindow(xbmcgui.Window):
 				elif (P==self.cStart): self.visuals[iTag].setVisible(True)
 				elif (P==self.cPath): self.visuals[iTag].setVisible(True)
 				elif (P==self.cWall): self.visuals[iTag].setVisible(False)
-				elif (P in [self.cLife,self.cKey]): self.visuals[iTag].setVisible(True)
+				elif (P in [self.cLife,self.cKey,self.cMyLove]): self.visuals[iTag].setVisible(True)
 				elif (P in [self.cMonster,self.cMonster0,self.cMonster1,self.cMonster2,self.cMonster3,self.cMonster4,self.cMonster5,self.cMonster6,self.cMonster7,self.cMonster8,self.cMonster9]): self.visuals[iTag].setVisible(True)
+				elif (P in [self.cPortalFA,self.cPortalTA,self.cPortalFP,self.cPortalTP,self.cPortalFO,self.cPortalTO,self.cPortalFQ,self.cPortalTQ,self.cPortalFU,self.cPortalTU,self.cPortalFJ,self.cPortalTJ,self.cToStart]): self.visuals[iTag].setVisible(True)
 				elif (P==self.cDoor): 
 					if self.gameKeys > 0: self.visuals[iTag].setVisible(True)
 					else: self.visuals[iTag].setVisible(False)
@@ -381,11 +445,21 @@ class MyWindow(xbmcgui.Window):
 		#debob('\n'+self.PuzzleFileHolder); 
 		if NewPos > len(self.PuzzleFileHolder): MoveValid=False; 
 		elif NewPos < 0: MoveValid=False; 
-		elif self.PuzzleFileHolder[NewPos]==self.cWall: MoveValid=False; 
-		elif self.PuzzleFileHolder[NewPos]=='\n': 			MoveValid=False; 
-		elif self.PuzzleFileHolder[NewPos]==self.cPath:  MoveValid=True; 
-		elif self.PuzzleFileHolder[NewPos]==self.cEnd: 	 MoveValid=True; 
-		elif self.PuzzleFileHolder[NewPos]==self.cStart: MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cWall: 	MoveValid=False; 
+		elif self.PuzzleFileHolder[NewPos]=='\n': 				MoveValid=False; 
+		elif self.PuzzleFileHolder[NewPos]==self.cPath:  	MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cEnd: 	 	MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cMyLove: 
+			if(self.gameKeys > (4-1)):
+				if (self.gameLifes > (10+1)):
+					SFX('kiss_1992'); 
+					self.gameKeys-=4; self.gameLifes-=10; self.gameMyLove+=1; MoveValid=True; deb('Found','Key'); 
+					self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
+					splash.do_My_Splash(artp('found01'),3,True,(self.scr['W'])/4,(self.scr['H'])/4,(self.scr['W'])/2,(self.scr['H'])/2); 
+					popOK(msg="You've finally come!",title="Sweet Heart",line2="You undo the chains (4 keys)",line3="You heal them (10 Life)")
+				else: popOK(msg="You've finally come!",title="Sweet Heart",line2="Please Heal me!",line3="Required: 4 Keys, 10 Life"); MoveValid=False; 
+			else: popOK(msg="You've finally come!",title="Sweet Heart",line2="Hurry, unchain me!",line3="Required: 4 Keys, 10 Life"); MoveValid=False; 
+		elif self.PuzzleFileHolder[NewPos]==self.cStart: 	MoveValid=True; 
 		#
 		#self.HoroTxt2.setText(self.StatsMsg % (str(self.gameLevel),str(self.gameLifes),str(self.gameKeys),str(self.gameMonstersKilled),str(self.gameMonstersLostTo)) ); 
 		#elif self.PuzzleFileHolder[NewPos]==self.cMonster: 
@@ -412,6 +486,19 @@ class MyWindow(xbmcgui.Window):
 			self.gameLifes=self.gameLifes+1; deb('Found','Extra Life'); 
 			self.PuzzleFileHolder=self.replacePos(NewPos,self.cPath,self.PuzzleFileHolder); 
 			MoveValid=True; 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFA: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTA)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTA); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTA: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFA)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFA); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFP: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTP)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTP); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTP: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFP)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFP); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFO: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTO)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTO); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTO: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFO)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFO); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFQ: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTQ)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTQ); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTQ: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFQ)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFQ); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFU: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTU)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTU); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTU: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFU)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFU); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalFJ: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalTJ)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalTJ); 
+		elif self.PuzzleFileHolder[NewPos]==self.cPortalTJ: self.JumpAvatar(self.PuzzleFileHolder.index(self.cPortalFJ)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cPortalFJ); 
+		elif self.PuzzleFileHolder[NewPos]==self.cToStart: self.JumpAvatar(self.PuzzleFileHolder.index(self.cStart)); MoveValid=True; NewPos=self.PuzzleFileHolder.index(self.cStart); 
 		#
 		else: MoveValid=False; 
 		#debob('NewPos character "'+self.PuzzleFileHolder[NewPos]+'"'); 
@@ -419,41 +506,49 @@ class MyWindow(xbmcgui.Window):
 			#debob('valid move from '+str(CurPos)+' to '+str(NewPos))
 			if self.PuzzleFileHolder_Original[CurPos]==self.cStart: 
 				    self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cUser,self.cStart,1)
-			if self.PuzzleFileHolder_Original[CurPos]==self.cEnd: 
+			elif self.PuzzleFileHolder_Original[CurPos]==self.cEnd: 
 				    self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cUser,self.cEnd,1)
+			elif self.PuzzleFileHolder_Original[CurPos] in [self.cPortalFA,self.cPortalFP,self.cPortalFO,self.cPortalFQ,self.cPortalFU,self.cPortalFJ,self.cPortalTA,self.cPortalTP,self.cPortalTO,self.cPortalTQ,self.cPortalTU,self.cPortalTJ,self.cToStart]: #self.cMyLove
+				    self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cUser,self.PuzzleFileHolder_Original[CurPos],1)
 			else: self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cUser,self.cPath,1)
-			#if self.PuzzleFileHolder[NewPos]==self.cPath:  
-			#	self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cPath,self.cUser,1)
-			#elif self.PuzzleFileHolder[NewPos]==self.cEnd: 	 
-			#	self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cEnd,self.cUser,1)
-			#elif self.PuzzleFileHolder[NewPos]==self.cStart: 
-			#	self.PuzzleFileHolder=self.PuzzleFileHolder.replace(self.cStart,self.cUser,1)
-			#self.PuzzleFileHolder=
-			#self.PuzzleFileHolder[NewPos:1]=self.cUser
-			#self.PuzzleFileHolder[NewPos]=self.cUser
+			##
 			self.PuzzleFileHolder=self.PuzzleFileHolder[0:NewPos]+self.cUser+self.PuzzleFileHolder[NewPos+1:len(self.PuzzleFileHolder)]; 
 			if self.gameLifes < 1: self.GameOver(); 
 			elif self.PuzzleFileHolder_Original[NewPos]==self.cEnd: self.VictoryDance(); 
+			#elif self.PuzzleFileHolder_Original[NewPos]==self.cMyLove: self.FinalVictoryDance(); 
 			if (tfalse(SettingG("show-map"))==True) and (tfalse(SettingG("show-maplocation"))==True): self.PrepareMaze(self.PuzzleFileHolder); 
 			NewPos=self.PuzzleFileHolder.index(self.cUser); 
 			self.displayVisualItems(NewPos); 
 		#self.cUser='@'; self.cEnd='E'; self.cStart='S'; self.cWall='#'; self.cPath=' '; 
+	def JumpAvatar(self,NewPos):
+		#self.PuzzleFileHolder.index(self.cPortalFJ)
+		return
 	def replacePos(self,Pos,n,t):
 		try: return t[0:Pos]+n+t[Pos+1:len(t)]
 		except: return t
 		
 	def VictoryDance(self):
 		try:
-				debob("game won"); 
+				if self.gameMyLove > 0: self.FinalVictoryDance(); return
+				deb("game won",str(self.gameMyLove)); 
 				SFX('fanfare_x'); 
-				#splash.do_My_Splash(self.iDuckShot3,1); 
-				splash.do_My_Splash(artj('corn-maze-exit'),3,True,(self.scr['W']-500)/2,(self.scr['H']-333)/2,500,333); 
-				#splash.do_My_Splash(artj('corn-maze-exit'),2,True,10,150,self.scr['W']-200,self.scr['H']-150); 
+				##splash.do_My_Splash(self.iDuckShot3,1); 
+				splash.do_My_Splash(artp('nextlevel02'),3,True,(self.scr['W']-580)/2,(self.scr['H']-135)/2,580,135); 
+				#splash.do_My_Splash(artj('corn-maze-exit'),3,True,(self.scr['W']-500)/2,(self.scr['H']-333)/2,500,333); 
+				##splash.do_My_Splash(artj('corn-maze-exit'),2,True,10,150,self.scr['W']-200,self.scr['H']-150); 
 				self.LoadGridFile(); 
 				xbmc.sleep(20); 
 				NewPos=self.PuzzleFileHolder.index(self.cUser); 
 				self.displayVisualItems(NewPos); 
 				#self.CloseWindow1st(); #DoA("Back"); 
+		except: pass
+	def FinalVictoryDance(self):
+		try:
+				deb("game won #2",str(self.gameMyLove)); 
+				SFX('fanfare2'); 
+				splash.do_My_Splash(artj('congrats02'),5,True,(self.scr['W'])/4,(self.scr['H'])/4,(self.scr['W'])/2,(self.scr['H'])/2); 
+				xbmc.sleep(20); 
+				self.CloseWindow1st(); #DoA("Back"); 
 		except: pass
 	def GameOver(self):
 		try:

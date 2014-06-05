@@ -41,6 +41,9 @@ R  - Monster0R
 
 9  - Monster09
 
+Aa Pp Oo Qq Uu Jj  - Portals
+
+s  - Portal to Start Lcation
 
 ===========================
 
@@ -69,6 +72,44 @@ Show map  - Show Text type Map.
 Show location on the map  - Update Text type map as you move.
 
 Show items  - Display items and monsters even when not next to them.
+
+
+Functionality
+===========================
+
+Exit by Exit-Button, Backspace, or Escape.
+
+Selectable Character Avatar in settings.
+
+Text-based Minimap.
+
+Stats for Level, Life and Keys.
+
+OUTSIDE OF GRID padding for visual display.
+
+LINE WRAPPING padding for visual display.
+
+Extremely custamizable Code and Options for easier porting to make additional games.
+
+Items: Key (unlocks a Door), Life (allows you to surve a monster battle).
+
+Monsters: R,0,1,2,3,4,5,6,7,8,9.
+
+Teleport Locations.
+
+Ability to carry over Life and Keys from one Level to the next.
+
+
+
+
+Not Functional Yet
+===========================
+
+Multiple outcomes for Monster Battles .
+
+Final Victory.
+
+
 
 
 ===========================

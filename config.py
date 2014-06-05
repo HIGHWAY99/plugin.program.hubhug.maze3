@@ -1,7 +1,7 @@
 ## from config import Config as Config
 
 import xbmc,xbmcaddon,xbmcplugin,os
-_addon_id="plugin.program.hubhug.maze3"; _addon_name="HUB-HUG Exit The Maze 3"; 
+_addon_id="plugin.program.hubhug.maze3"; _addon_name="HUB-HUG Dungeon Crawler"; 
 _addon=xbmcaddon.Addon(id=_addon_id); 
 
 def gAI(t):
@@ -17,7 +17,7 @@ class Config:
 	addon=_addon
 	handle=0
 	name=gAI('name'); 
-	name2=gAI('name') +":  "+"[COLOR seagreen]Sleeping Monsters[/COLOR]"; 
+	name2=gAI('name') +":  "+"[COLOR seagreen]Monster Adventures[/COLOR]"; 
 	#name="XBMCHUB Repositories Browser"; 
 	path=gAI('path'); 
 	#profile=xbmc.translatePath(gAI('profile'))
@@ -25,7 +25,7 @@ class Config:
 	icon=gAI('icon'); fanart=gAI('fanart'); 
 	addon_type=gAI('type'); author=gAI('author'); version=gAI('version'); stars=gAI('stars'); changelog=gAI('changelog'); 
 	
-	artPath=xbmc.translatePath(os.path.join(path,'art'))
+	artPath=xbmc.translatePath(os.path.join(path,'art2'))
 	
 	
 	ACTION_PREVIOUS_MENU 		=  10	## ESC action
