@@ -17,7 +17,7 @@ class Config:
 	addon=_addon
 	handle=0
 	name=gAI('name'); 
-	name2=gAI('name') +":  "+"[COLOR seagreen]Monster Adventures[/COLOR]"; 
+	name2=gAI('name') +":  "+"[COLOR seagreen]Rescuing My Love[/COLOR]"; 
 	#name="XBMCHUB Repositories Browser"; 
 	path=gAI('path'); 
 	#profile=xbmc.translatePath(gAI('profile'))
@@ -38,6 +38,15 @@ class Config:
 	ACTION_MOUSE_WHEEL_DOWN = 105	## Mouse wheel down
 	ACTION_MOUSE_DRAG 			= 106	## Mouse drag
 	ACTION_MOUSE_MOVE 			= 107	## Mouse move
+	#
+	ACTION_SELECT_ITEM			=		7	## ?
+	ACTION_PARENT_DIR				=		9	## ?
+	ACTION_CONTEXT_MENU			=	117	## ?
+	ACTION_NEXT_ITEM				=	 14	## ?
+	ACTION_BACKSPACE				=	110	## ?
+	
+	
+	
 	def gSetting(self,setting):
 		try: return self.addon.getSetting(setting)
 		except: return ""
