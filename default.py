@@ -667,31 +667,34 @@ class MyWindow(xbmcgui.Window):
 			if self.PuzzleFileHolder[Pos] in [self.cMonster,self.cMonster0,self.cMonster1,self.cMonster2,self.cMonster3,self.cMonster4,self.cMonster5,self.cMonster6,self.cMonster7,self.cMonster8,self.cMonster9]: return True
 			else: return False
 		except: return False
+	def MoveMob(self,OldPos,NewPos):
+		try:
+			self.PuzzleFileHolder=self.replacePos(NewPos,self.PuzzleFileHolder[OldPos],self.PuzzleFileHolder); 
+			self.PuzzleFileHolder=self.replacePos(OldPos,self.cPath,self.PuzzleFileHolder); 
+		except: pass
 	def MoveMent_AdjustMonsterPlacement(self,action,F,CurPos,NewPos):
 			## Mobs to the Right of the User.
-			zz=[[1,1,0,''],
-					[1,2,1,self.cPath],
-					[1,3,2,self.cPath+self.cPath],
-					[1,4,3,self.cPath+self.cPath+self.cPath],
-					[1,5,4,self.cPath+self.cPath+self.cPath+self.cPath],
-					]
-			for (i,n,nn,e) in zz:
-				if self.isMonster((NewPos+i)+n)==True:
-					if self.PuzzleFileHolder[(NewPos+i):(NewPos+i)+nn]==e:
-						self.PuzzleFileHolder=self.replacePos((NewPos+i)+nn,self.PuzzleFileHolder[(NewPos+i)+n],self.PuzzleFileHolder); 
-						self.PuzzleFileHolder=self.replacePos((NewPos+i)+n,self.cPath,self.PuzzleFileHolder); 
-			## Mobs to the Right of the User.
-			zz=[[0-1,0-1,0-0,''],
-					[0-1,0-2,0-1,self.cPath],
-					[0-1,0-3,0-2,self.cPath+self.cPath],
-					[0-1,0-4,0-3,self.cPath+self.cPath+self.cPath],
-					[0-1,0-5,0-4,self.cPath+self.cPath+self.cPath+self.cPath],
-					]
-			for (i,n,nn,e) in zz:
-				if self.isMonster((NewPos+i)+n)==True:
-					if self.PuzzleFileHolder[(NewPos+i)+nn:(NewPos+i)]==e:
-						self.PuzzleFileHolder=self.replacePos((NewPos+i)+nn,self.PuzzleFileHolder[(NewPos+i)+n],self.PuzzleFileHolder); 
-						self.PuzzleFileHolder=self.replacePos((NewPos+i)+n,self.cPath,self.PuzzleFileHolder); 
+			i=1; n=1
+			if (self.isMonster((NewPos+i)+n)==True) and (self.isEmptyPath((NewPos+i)+n-1)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n-1); 
+			i=1; n=2
+			if (self.isMonster((NewPos+i)+n)==True) and (self.isEmptyPath((NewPos+i)+n-1)==True) and (self.isEmptyPath((NewPos+i)+n-2)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n-1); 
+			i=1; n=3
+			if (self.isMonster((NewPos+i)+n)==True) and (self.isEmptyPath((NewPos+i)+n-1)==True) and (self.isEmptyPath((NewPos+i)+n-2)==True) and (self.isEmptyPath((NewPos+i)+n-3)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n-1); 
+			i=1; n=4
+			if (self.isMonster((NewPos+i)+n)==True) and (self.isEmptyPath((NewPos+i)+n-1)==True) and (self.isEmptyPath((NewPos+i)+n-2)==True) and (self.isEmptyPath((NewPos+i)+n-3)==True) and (self.isEmptyPath((NewPos+i)+n-4)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n-1); 
+			i=1; n=5
+			if (self.isMonster((NewPos+i)+n)==True) and (self.isEmptyPath((NewPos+i)+n-1)==True) and (self.isEmptyPath((NewPos+i)+n-2)==True) and (self.isEmptyPath((NewPos+i)+n-3)==True) and (self.isEmptyPath((NewPos+i)+n-4)==True) and (self.isEmptyPath((NewPos+i)+n-5)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n-1); 
+			## Mobs to the Left of the User.
+			i=1; n=1
+			if (self.isMonster((NewPos-i)-n)==True) and (self.isEmptyPath((NewPos-i)-n+1)==True): self.MoveMob((NewPos-i)-n,(NewPos-i)-n+1); 
+			i=1; n=2
+			if (self.isMonster((NewPos-i)-n)==True) and (self.isEmptyPath((NewPos-i)-n+1)==True) and (self.isEmptyPath((NewPos-i)-n+2)==True): self.MoveMob((NewPos-i)-n,(NewPos-i)-n+1); 
+			i=1; n=3
+			if (self.isMonster((NewPos-i)-n)==True) and (self.isEmptyPath((NewPos-i)-n+1)==True) and (self.isEmptyPath((NewPos-i)-n+2)==True) and (self.isEmptyPath((NewPos-i)-n+3)==True): self.MoveMob((NewPos-i)-n,(NewPos-i)-n+1); 
+			i=1; n=4
+			if (self.isMonster((NewPos-i)-n)==True) and (self.isEmptyPath((NewPos-i)-n+1)==True) and (self.isEmptyPath((NewPos-i)-n+2)==True) and (self.isEmptyPath((NewPos-i)-n+3)==True) and (self.isEmptyPath((NewPos-i)-n+4)==True): self.MoveMob((NewPos+i)+n,(NewPos+i)+n+1); 
+			i=1; n=5
+			if (self.isMonster((NewPos-i)-n)==True) and (self.isEmptyPath((NewPos-i)-n+1)==True) and (self.isEmptyPath((NewPos-i)-n+2)==True) and (self.isEmptyPath((NewPos-i)-n+3)==True) and (self.isEmptyPath((NewPos-i)-n+4)==True) and (self.isEmptyPath((NewPos-i)-n+5)==True): self.MoveMob((NewPos-i)-n,(NewPos-i)-n+1); 
 			## Mobs Above of the User.
 			i=1; n=2; nn=1; e=''+self.cPath
 			if self.isMonster((NewPos-((self.LineLength+1)*n)))==True:
