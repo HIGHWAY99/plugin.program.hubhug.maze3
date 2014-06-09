@@ -4,18 +4,18 @@
 ###A            J                                                                                                                                                                                       p###
 ###                                                                                                                                                                                                      ###
 ###                                                                                                                                                                                                      ###
-##S                                 R      RRR                       R                                                                                                                                   ###
-###                                 R      RRR                       R                                                                                                                                   ###
-###                                 R      RRR                       R                                                                                                                                   ###
-###                                 R      RRR                       R                                                                                                                                   ###
-###                                 R      RRR                       R                                                                                                                                   ###
-###                                 R                                R                                                                                                                                   ###
-###                                 R                                R                                                                                                        RRRRRRRRRRR                ###
-###                                 R                                                                                                                                                                    ###
-###                                 R             RRR                                                                                                                                                    ###
-###                                 R              RR                                                                                                                                                    ###
-###         LLL                     R              RR                                                                                                                                                    ###
-###         LLL                     R               R                                                                                                                                                    ###
+##S               #                 R      RRR                       R                                                                                                                                   ###
+###                                 0      RRR                       R                                                                                                                                   ###
+###               #                 1      RRR                       R                                                                                                                                   ###
+###                                 2      RRR                       R                                                                                                                                   ###
+###               #                 3      RRR                       R                                                                                                                                   ###
+###                                 4                                R                                                                                                                                   ###
+###               D                 5                                R                                                                                                        RRRRRRRRRRR                ###
+###                                 6                                                                                                                                                                    ###
+###               D                 7             RRR                                                                                                                                                    ###
+###               #                 8              RR                                                                                                                                                    ###
+###         LLL                     9              RR                                                                                                                                                    ###
+###         LLL   #                 R               R                                                                                                                                                    ###
 ###         LLL                                                                                                                                                                                          ###
 ###         LLL                                                                                                                                                                                          ###
 ###         LLL                                                                                                                                                                                          ###
