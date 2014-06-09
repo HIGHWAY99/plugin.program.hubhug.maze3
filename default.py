@@ -1,4 +1,5 @@
-# ###  - By TheHighway ### #
+# ########################################################## #
+# ###  - By TheHighway                                   ### #
 # ########################################################## #
 
 import xbmc,xbmcgui,urllib,urllib2,os,sys,logging,array,re,time,datetime,random,string,StringIO,xbmcplugin,xbmcaddon
@@ -18,7 +19,7 @@ def SFX(n,e='.wav'):
 		except: pass
 
 class MyWindow(xbmcgui.Window):
-	ArtWork={}; visuals={}; button={}; Mistakes=0; NoOfMoves=0; tagUp="UP"; tagLeft="LEFT"; tagRight="RIGHT"; tagDown="DOWN"; 
+	ArtWork={}; visuals={}; button={}; Mistakes=0; NoOfMoves=0; tagUp="up"; tagLeft="left"; tagRight="right"; tagDown="down"; 
 	countA=0; countB=0; LineLength=0; ImFacing='down'; cSplit='\n||\n'; 
 	MazeFont='font10'; MazeFont2='font14'; cUser='$'; cEnd='E'; cStart='S'; cWall='#'; cPath=' '; 
 	csMap='O'; cMonster='R'; cKey='K'; cDoor='D'; cLife='L'; cToStart='s'; cMyLove='Y'; cSuperLife='l'; 
@@ -74,17 +75,17 @@ class MyWindow(xbmcgui.Window):
 		self.ArtWork['Key']='key01'; 
 		self.ArtWork['Life']='life03'; 
 		self.ArtWork['SuperLife']='life02'; 
-		self.ArtWork['MonsterR']='monster0R'; 
-		self.ArtWork['Monster0']='monster00'; 
-		self.ArtWork['Monster1']='monster01'; 
-		self.ArtWork['Monster2']='monster02'; 
-		self.ArtWork['Monster3']='monster03'; 
-		self.ArtWork['Monster4']='monster04'; 
-		self.ArtWork['Monster5']='monster05'; 
-		self.ArtWork['Monster6']='monster06'; 
-		self.ArtWork['Monster7']='monster07'; 
-		self.ArtWork['Monster8']='monster08'; 
-		self.ArtWork['Monster9']='monster09'; 
+		self.ArtWork['MonsterR']='npc07'; 
+		self.ArtWork['Monster0']='npc0R'; 
+		self.ArtWork['Monster1']='npc21'; 
+		self.ArtWork['Monster2']='npc18'; 
+		self.ArtWork['Monster3']='npc03'; 
+		self.ArtWork['Monster4']='npc26'; 
+		self.ArtWork['Monster5']='npc24'; 
+		self.ArtWork['Monster6']='npc06'; 
+		self.ArtWork['Monster7']='npc01'; 
+		self.ArtWork['Monster8']='npc23'; 
+		self.ArtWork['Monster9']='npc09'; 
 		self.ArtWork['ToStart']='start02'; 
 		self.ArtWork['Start']='start01'; 
 		self.ArtWork['Exit']='home-favourites-FO_red'; 
@@ -94,6 +95,9 @@ class MyWindow(xbmcgui.Window):
 		self.ArtWork['Portal4']='pegan04'; 
 		self.ArtWork['Portal5']='pegan05'; 
 		self.ArtWork['Portal6']='pegan06'; 
+		
+		
+		## ### Splash
 		self.ArtWork['FoundMyLove']='found01'; 
 		
 		## ### ## Non-Graphics.
@@ -122,7 +126,10 @@ class MyWindow(xbmcgui.Window):
 					except: pass
 					zz=['R','0','1','2','3','4','5','6','7','8','9']
 					for z in zz:
-						try: self.ArtWork['Monster'+z]=tData['monster'+z] #.lower()]
+						try: self.ArtWork['Monster'+z]=tData['monster'+z]
+						except: pass
+					for z in zz:
+						try: self.ArtWork['Monster'+z]=tData['monster0'+z]
 						except: pass
 					
 	def LoadGridFile(self):
@@ -385,6 +392,12 @@ class MyWindow(xbmcgui.Window):
 			#elif P in [self.cPortalFA,self.cPortalFP,self.cPortalFO,self.cPortalFQ,self.cPortalFU,self.cPortalFJ]: return 'pegan02' #'portal01'
 			#elif P in [self.cPortalTA,self.cPortalTP,self.cPortalTO,self.cPortalTQ,self.cPortalTU,self.cPortalTJ]: return 'pegan02' #'portal02'
 			elif P==self.cUser: 
+				direction=self.ImFacing.lower()
+				#if direction=='up':
+				#if direction=='right':
+				#if direction=='left':
+				#if direction=='down':
+				#return 'char01'+direction
 				try:
 					return {
 						'SeaGreen':					'SeaGreen'
@@ -402,6 +415,28 @@ class MyWindow(xbmcgui.Window):
 						,'Girl2':						'girl02'
 						,'GirlNLove':				'girl03'
 						,'HoodedGirl':			'girl04'
+						,'08 BlackHaired Boy':					'char08'+direction
+						,'01 Boy':											'char01'+direction
+						,'02 Boy':											'char02'+direction
+						,'03 Boy':											'char03'+direction
+						,'06 Boy in Purple':						'char06'+direction
+						,'07 Girl':											'char07'+direction
+						,'04 Blond Girl':								'char04'+direction
+						,'05 BlueHaired Girl':					'char05'+direction
+						,'09 BlackHaired Girl in Red':	'char09'+direction
+						,'10 Rich Blonde Girl':					'char10'+direction
+						,'11 Cleopatra':								'char11'+direction
+						,'12 Blonde Princess':					'char12'+direction
+						#,'':				'char13'+direction
+						#,'':				'char14'+direction
+						#,'':				'char15'+direction
+						#,'':				'char16'+direction
+						#,'':				'char17'+direction
+						#,'':				'char18'+direction
+						#,'':				'char19'+direction
+						#,'':				'char20'+direction
+						#,'':				'char21'+direction
+						#,'':				'char22'+direction
 						#,'':				''
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'
@@ -423,6 +458,18 @@ class MyWindow(xbmcgui.Window):
 						,'Girl2':						'hero01' #girl02'
 						,'GirlNLove':				'hero06' #girl03'
 						,'HoodedGirl':			'hero00' #girl04'
+						,'08 BlackHaired Boy':					'char04'+'down'
+						,'01 Boy':											'char11'+'down'
+						,'02 Boy':											'char07'+'down'
+						,'03 Boy':											'char09'+'down'
+						,'06 Boy in Purple':						'char10'+'down'
+						,'07 Girl':											'char02'+'down'
+						,'04 Blond Girl':								'char08'+'down'
+						,'05 BlueHaired Girl':					'char08'+'down'
+						,'09 BlackHaired Girl in Red':	'char03'+'down'
+						,'10 Rich Blonde Girl':					'char06'+'down'
+						,'11 Cleopatra':								'char01'+'down'
+						,'12 Blonde Princess':					'char02'+'down'
 						#,'':				''
 					}[SettingG("img-player")]
 				except: return 'f_seagreen'

@@ -1,8 +1,11 @@
+[B]Version 0.1.5[/B]
+- Facing Directions for SOME of the USER graphics.
+- More Monster Graphics.
+- More USER Graphics.
+
 [B]Version 0.1.2[/B]
 
 [I]06-08-2014[/I]
-- 
-- 
 - Made a Fun little wide open map for testing movement coding and such.
 - Some slight straight-directional Monster Movement within so much distance of the user.  Currently no diagnal movement.  Currently Monsters only see in a straight line.  Currently Monsters don't start a battle with you, unless you move onto their position.
 - Text Map's View Distance.
