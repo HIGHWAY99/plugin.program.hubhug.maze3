@@ -28,9 +28,16 @@ def nolines(t):
 	for L in it: t=t+L
 	t=((t.replace("\r","")).replace("\n",""))
 	return t
-def art(f,fe=''): return xbmc.translatePath(os.path.join(Config.artPath,f+fe))
-def artp(f,fe='.png'): return art(f,fe)
-def artj(f,fe='.jpg'): return art(f,fe)
+def art(f,fe=''): 
+	fe1='.png'; fe2='.jpg'; fe3='.gif'; 
+	if   fe1 in f: f=f.replace(fe1,''); fe=fe1; 
+	elif fe2 in f: f=f.replace(fe2,''); fe=fe2; 
+	elif fe3 in f: f=f.replace(fe3,''); fe=fe3; 
+	return xbmc.translatePath(os.path.join(Config.artPath,f+fe))
+def artp(f,fe='.png'): 
+	return art(f,fe)
+def artj(f,fe='.jpg'): 
+	return art(f,fe)
 def BusyAnimationShow(): 				xbmc.executebuiltin('ActivateWindow(busydialog)')
 def BusyAnimationHide(): 				xbmc.executebuiltin('Dialog.Close(busydialog,true)')
 def closeAllDialogs():   				xbmc.executebuiltin('Dialog.Close(all, true)') 
@@ -122,7 +129,10 @@ def showkeyboard(txtMessage="",txtHeader="",passwordField=False):
 		if keyboard.isConfirmed(): return keyboard.getText()
 		else: return '' #return False
 	except: return ''
-
+def is_odd(num): 
+	try:
+		return num % 2 != 0
+	except: return False
 
 
 ## ################################################## ##
