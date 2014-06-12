@@ -1,5 +1,8 @@
-[B]Version 0.2.1[/B]
+[B]Version 0.2.2[/B]
+[I]06-11-2014[/I]
+- Adjustments to File Updater.
 
+[B]Version 0.2.1[/B]
 [I]06-11-2014[/I]
 - File Updater.
 

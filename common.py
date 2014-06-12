@@ -144,6 +144,8 @@ def SFX(n,e='.wav'):
 	except: 
 		try: xbmc.playSFX(snd)
 		except: pass
+def isPath(path): return os.path.exists(path)
+def isFile(filename): return os.path.isfile(filename)
 ## ################################################## ##
 def CatchLocalFileList():
 	zz=[xbmc.translatePath(Config.path),xbmc.translatePath(Config.resourcesPath),xbmc.translatePath(Config.puzzlePath),xbmc.translatePath(Config.artPath)]
@@ -165,35 +167,47 @@ def ExtractThis(filename,destpath):
 def UpdateCheck():
 	if tfalse(SettingG("updater"))==False: return
 	P=xbmc.translatePath(Config.path); U=Config.UpdateListUrl; 
-	try:
-		List_Local =_OpenFile(addonPath(Config.UpdateListFile)).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
-		List_Online=getURL(U+Config.UpdateListFile).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
-		if List_Local==List_Online: return
-		if not '||' in List_Online: print 'Error checking for updates.  Error in online file list.'; return
-	except: print 'Error checking for updates.'; return
+	print U+Config.UpdateListFile; 
+	#try:
+	List_Local =_OpenFile(addonPath(Config.UpdateListFile)).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
+	print str(len(List_Local)); 
+	List_Online=getURL(U+Config.UpdateListFile).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
+	print str(len(List_Online)); 
+	if List_Local==List_Online: print 'Files are up to date.'; return
+	if not '||' in List_Online: print 'Error checking for updates.  Error in online file list.'; return
+	#except: print 'Error checking for updates.'; return
 	import HiddenDownloader as MyDownloader
 	DP=xbmcgui.DialogProgress(); DP.create('Updating Files','Initializing...'); 
 	try:
-		if '\n||\n' in List_Online: List_Online=List_Online.split('\n||\n')[0].strip()
+		#if '\n||\n' in List_Online: List_Online=List_Online.split('\n||\n')[0].strip()
+		if '||' in List_Online: List_Online=List_Online.split('||')[0].strip()
 	except: pass
-	List_Array=List_Online.split('\n')[0].strip()
-	total=len(List_Array); curI=0; 
+	print str(len(List_Online)); 
+	List_Array=List_Online.strip().split('\n')
+	print str(len(List_Array)); print List_Array; 
+	total=len(List_Array); curI=0; FilesFailed=0; 
 	for FileItem in List_Array:
-		if (len(FileItem) > 0) and (not '#' in FileItem) and ('.' in FileItem):
+		FileItem=FileItem.strip(); 
+		if (len(FileItem) > 1) and (not '#' in FileItem) and ('.' in FileItem):
 			try: tFolder,tFile=FileItem.split('|'); 
 			except: tFolder=''; tFile=FileItem; 
-			DP.update(curI/total*100,'Path: '+tFolder,'File: '+tFile)
+			DP.update((100*curI/total),'Path: '+tFolder,'File: '+tFile)
+			time.sleep(2); 
+			#print tFolder+'\\'+tFile; 
 			if len(tFolder)==0: tLocalFile=xbmc.translatePath(os.path.join(P,tFile))
 			else: tLocalFile=xbmc.translatePath(os.path.join(P,tFolder,tFile))
 			if len(tFolder)==0: tLocalPath=xbmc.translatePath(P)
 			else: tLocalPath=xbmc.translatePath(os.path.join(P,tFolder))
 			if len(tFolder)==0: tRemoteFile=U+tFile
 			else: tRemoteFile=U+tFolder+'/'+tFile
+			print [str((100*curI/total)),str((curI/total*100)),tFolder,tFile,tLocalPath,tLocalFile,tRemoteFile]; 
 			try:
 				MyDownloader.download(tRemoteFile,tFile,tLocalPath,False); 
 				if '.zip' in tFile: ExtractThis(tLocalFile,tLocalPath)
-			except: pass
+			#except urllib2.URLError, e: print e.code; 
+			except: print 'error downloading file: '+tFile; FilesFailed+=1; 
 		curI+=1; 
+		print str(FilesFailed)+' files failed to download.'
 	DP.close()
 ## ################################################## ##
 
