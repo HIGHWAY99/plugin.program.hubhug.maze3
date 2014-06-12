@@ -38,6 +38,8 @@ def artp(f,fe='.png'):
 	return art(f,fe)
 def artj(f,fe='.jpg'): 
 	return art(f,fe)
+def addonPath(f,fe=''):
+	return xbmc.translatePath(os.path.join(Config.path,f+fe))
 def BusyAnimationShow(): 				xbmc.executebuiltin('ActivateWindow(busydialog)')
 def BusyAnimationHide(): 				xbmc.executebuiltin('Dialog.Close(busydialog,true)')
 def closeAllDialogs():   				xbmc.executebuiltin('Dialog.Close(all, true)') 
@@ -133,6 +135,67 @@ def is_odd(num):
 	try:
 		return num % 2 != 0
 	except: return False
+def DoA(a): xbmc.executebuiltin("Action(%s)" % a)
+def SFX(n,e='.wav'):
+	if len(n)==0: return
+	if (n==' ') or (n=='...') or (n=='_'): return
+	snd=art(n,e)
+	try: xbmc.playSFX(snd,False)
+	except: 
+		try: xbmc.playSFX(snd)
+		except: pass
+## ################################################## ##
+def CatchLocalFileList():
+	zz=[xbmc.translatePath(Config.path),xbmc.translatePath(Config.resourcesPath),xbmc.translatePath(Config.puzzlePath),xbmc.translatePath(Config.artPath)]
+	zL=''
+	for z in zz:
+		try:
+			zList=os.listdir(z)
+			for L in zList:
+				if (not '.bak' in L) and (not '.pyo' in L) and (not '.log' in L) and (not '.lnk' in L) and (not 'thumbnail' in L.lower()):
+					if '.' in L:
+						try: zL+=os.path.join(z,L)+'\n'; 
+						except: pass
+		except: pass
+	zL=zL.replace(Config.path+'\\','').replace(Config.path,'').replace('\\','|').replace('\n\n','\n').strip()
+	_SaveFile(addonPath('temp.txt'),zL)
+def ExtractThis(filename,destpath):
+	import Extract as extract
+	return extract.allNoProgress(filename,destpath)
+def UpdateCheck():
+	if tfalse(SettingG("updater"))==False: return
+	P=xbmc.translatePath(Config.path); U=Config.UpdateListUrl; 
+	try:
+		List_Local =_OpenFile(addonPath(Config.UpdateListFile)).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
+		List_Online=getURL(U+Config.UpdateListFile).strip().replace('\a','\n').replace('\r','\n').replace('\n\n\n','\n').replace('\n\n','\n').strip(); 
+		if List_Local==List_Online: return
+		if not '||' in List_Online: print 'Error checking for updates.  Error in online file list.'; return
+	except: print 'Error checking for updates.'; return
+	import HiddenDownloader as MyDownloader
+	DP=xbmcgui.DialogProgress(); DP.create('Updating Files','Initializing...'); 
+	try:
+		if '\n||\n' in List_Online: List_Online=List_Online.split('\n||\n')[0].strip()
+	except: pass
+	List_Array=List_Online.split('\n')[0].strip()
+	total=len(List_Array); curI=0; 
+	for FileItem in List_Array:
+		if (len(FileItem) > 0) and (not '#' in FileItem) and ('.' in FileItem):
+			try: tFolder,tFile=FileItem.split('|'); 
+			except: tFolder=''; tFile=FileItem; 
+			DP.update(curI/total*100,'Path: '+tFolder,'File: '+tFile)
+			if len(tFolder)==0: tLocalFile=xbmc.translatePath(os.path.join(P,tFile))
+			else: tLocalFile=xbmc.translatePath(os.path.join(P,tFolder,tFile))
+			if len(tFolder)==0: tLocalPath=xbmc.translatePath(P)
+			else: tLocalPath=xbmc.translatePath(os.path.join(P,tFolder))
+			if len(tFolder)==0: tRemoteFile=U+tFile
+			else: tRemoteFile=U+tFolder+'/'+tFile
+			try:
+				MyDownloader.download(tRemoteFile,tFile,tLocalPath,False); 
+				if '.zip' in tFile: ExtractThis(tLocalFile,tLocalPath)
+			except: pass
+		curI+=1; 
+	DP.close()
+## ################################################## ##
 
 
 ## ################################################## ##

@@ -9,16 +9,6 @@ from common import *
 import common
 import splash_highway as splash
 
-def DoA(a): xbmc.executebuiltin("Action(%s)" % a)
-def SFX(n,e='.wav'):
-	if len(n)==0: return
-	if (n==' ') or (n=='...') or (n=='_'): return
-	snd=art(n,e)
-	try: xbmc.playSFX(snd,False)
-	except: 
-		try: xbmc.playSFX(snd)
-		except: pass
-
 class MyWindow(xbmcgui.Window):
 	ArtWork={}; visuals={}; button={}; Mistakes=0; NoOfMoves=0; tagUp="up"; tagLeft="left"; tagRight="right"; tagDown="down"; 
 	countA=0; countB=0; LineLength=0; ImFacing='down'; cSplit='\n||\n'; 
@@ -1068,6 +1058,9 @@ class MyWindow(xbmcgui.Window):
 		#	try: self.removeControl(z); del z
 		#	except: pass
 		self.close()
+## ################################################## ##
+#CatchLocalFileList()
+UpdateCheck()
 ## ################################################## ##
 ## ################################################## ##
 ## Start of program

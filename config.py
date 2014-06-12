@@ -26,7 +26,8 @@ class Config:
 	addon_type=gAI('type'); author=gAI('author'); version=gAI('version'); stars=gAI('stars'); changelog=gAI('changelog'); 
 	
 	artPath=xbmc.translatePath(os.path.join(path,'art2'))
-	
+	puzzlePath=xbmc.translatePath(os.path.join(path,'puzzles'))
+	resourcesPath=xbmc.translatePath(os.path.join(path,'resources'))
 	
 	ACTION_PREVIOUS_MENU 		=  10	## ESC action
 	ACTION_NAV_BACK 				=  92	## Backspace action
@@ -45,7 +46,8 @@ class Config:
 	ACTION_NEXT_ITEM				=	 14	## ?
 	ACTION_BACKSPACE				=	110	## ?
 	
-	
+	UpdateListFile='filelist.txt'; 
+	UpdateListUrl='http://raw.github.com/HIGHWAY99/plugin.program.hubhug.maze3/master/'; 
 	
 	def gSetting(self,setting):
 		try: return self.addon.getSetting(setting)
