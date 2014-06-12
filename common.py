@@ -154,7 +154,7 @@ def CatchLocalFileList():
 		try:
 			zList=os.listdir(z)
 			for L in zList:
-				if (not '.bak' in L) and (not '.pyo' in L) and (not '.log' in L) and (not '.lnk' in L) and (not 'thumbnail' in L.lower()):
+				if (not '.bak' in L) and (not '.pyo' in L) and (not '.log' in L) and (not '.lnk' in L) and (not 'thumbs.db' in L.lower()):
 					if '.' in L:
 						try: zL+=os.path.join(z,L)+'\n'; 
 						except: pass
@@ -203,7 +203,7 @@ def UpdateCheck():
 			print [str((100*curI/total)),str((curI/total*100)),tFolder,tFile,tLocalPath,tLocalFile,tRemoteFile]; 
 			try:
 				MyDownloader.download(tRemoteFile,tFile,tLocalPath,False); 
-				if '.zip' in tFile: ExtractThis(tLocalFile,tLocalPath)
+				if '.zip' in tFile: ExtractThis(tLocalFile,tLocalPath); os.remove(tLocalFile); 
 			#except urllib2.URLError, e: print e.code; 
 			except: print 'error downloading file: '+tFile; FilesFailed+=1; 
 		curI+=1; 
